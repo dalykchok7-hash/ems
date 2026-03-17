@@ -1,0 +1,2 @@
+from .auth_views import LoginView,CreerPersonnelView
+from .dashboard_views import DashboardStatsView

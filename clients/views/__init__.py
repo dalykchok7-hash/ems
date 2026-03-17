@@ -1,0 +1,2 @@
+from .client_views      import ClientListView, ClientDetailView,ClientSeancesView,ClientStatsView
+from .abonnement_views import AbonnementClientView, AbonnementHistoriqueView, AbonnementDetailView
