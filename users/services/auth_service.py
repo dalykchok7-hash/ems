@@ -10,7 +10,6 @@ from drf_spectacular.types import OpenApiTypes
 from rest_framework_simplejwt.tokens     import RefreshToken
 from rest_framework_simplejwt.exceptions import TokenError
 from users.serializers   import UtilisateurSerializer, CreerPersonnelSerializer, LoginSerializer
-from users.services      import AuthService
 from users.permissions   import IsAdmin
 from historique.services import HistoriqueService
 
