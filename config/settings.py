@@ -104,6 +104,7 @@ SPECTACULAR_SETTINGS = {
     'TITLE': 'EMS Project API',
     'DESCRIPTION': 'Documentation de l\'API EMS',
     'VERSION': '1.0.0',
+    
 }
 
 # ── JWT ──────────────────────────────────────

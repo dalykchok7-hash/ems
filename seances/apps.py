@@ -9,7 +9,8 @@ class SeancesConfig(AppConfig):
         import django
         from django.db import connection
         try:
-            if connection.vendor:
+            # Vérifier que les tables existent avant de générer
+            if 'seances_seance' in connection.introspection.table_names():
                 from seances.services import SeanceService
                 SeanceService.verifier_et_generer()
         except Exception:
