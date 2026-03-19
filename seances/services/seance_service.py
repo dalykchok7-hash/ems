@@ -5,19 +5,21 @@ from seances.models import Seance
 class SeanceService:
 
     @staticmethod
-    def generer_seances(jours=365):
-        aujourd_hui    = date.today()
+    def generer_seances(jours=365, date_debut=None):
+        if date_debut is None:
+            date_debut = date.today()
+
         seances_a_creer = []
 
         # Récupérer les créneaux existants
         existants = set(
             Seance.objects.filter(
-                date__gte=aujourd_hui
+                date__gte=date_debut
             ).values_list('date', 'heure_debut')
         )
 
         for i in range(jours):
-            jour = aujourd_hui + timedelta(days=i)
+            jour = date_debut + timedelta(days=i)
 
             for heure in range(24):
                 for minute in [0, 30]:
