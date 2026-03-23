@@ -8,7 +8,7 @@ from drf_spectacular.types import OpenApiTypes
 
 from users.permissions  import IsAdmin
 from users.models       import Utilisateur
-from users.serializers  import UtilisateurSerializer, CreerPersonnelSerializer
+from users.serializers  import UtilisateurSerializer, CreerPersonnelSerializer, ModifierPersonnelSerializer
 from users.services     import AuthService
 
 
@@ -96,6 +96,7 @@ class PersonnelDetailView(APIView):
 
     @extend_schema(
         summary   = 'Modifier un membre du personnel',
+        request   = ModifierPersonnelSerializer,
         responses = {
             200: UtilisateurSerializer,
             404: OpenApiTypes.OBJECT,
@@ -108,17 +109,21 @@ class PersonnelDetailView(APIView):
                 {'error': 'Personnel non trouvé'},
                 status=status.HTTP_404_NOT_FOUND
             )
-
+        serializer = ModifierPersonnelSerializer(data=request.data)
+        if not serializer.is_valid():
+            return Response(
+                serializer.errors,
+                status=status.HTTP_400_BAD_REQUEST
+            )
         champs_modifiables = [
             'first_name', 'last_name',
             'telephone', 'shift', 'date_embauche'
         ]
 
-        for champ in champs_modifiables:
-            if champ in request.data:
-                setattr(personnel, champ, request.data[champ])
-
+        for champ, valeur in serializer.validated_data.items():
+            setattr(personnel, champ, valeur)
         personnel.save()
+        
         return Response(UtilisateurSerializer(personnel).data)
 
     @extend_schema(

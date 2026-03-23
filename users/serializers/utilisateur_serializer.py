@@ -47,3 +47,13 @@ class CreerPersonnelSerializer(serializers.Serializer):
 class LoginSerializer(serializers.Serializer):
     username = serializers.CharField(max_length=150)
     password = serializers.CharField(max_length=128, write_only=True)
+    
+class ModifierPersonnelSerializer(serializers.Serializer):
+    first_name    = serializers.CharField(max_length=100, required=False)
+    last_name     = serializers.CharField(max_length=100, required=False)
+    telephone     = serializers.CharField(max_length=20,  required=False)
+    shift         = serializers.ChoiceField(
+                        choices  = ['jour', 'soir'],
+                        required = False
+                    )
+    date_embauche = serializers.DateField(required=False)

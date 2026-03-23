@@ -1,1 +1,1 @@
-from .utilisateur_serializer import UtilisateurSerializer, CreerPersonnelSerializer, LoginSerializer
+from .utilisateur_serializer import UtilisateurSerializer, CreerPersonnelSerializer, LoginSerializer, ModifierPersonnelSerializer
