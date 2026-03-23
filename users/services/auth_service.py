@@ -19,6 +19,7 @@ class AuthService:
     @staticmethod
     def login(username, password):
         # Vérifier que l'utilisateur existe
+        
         try:
             user = Utilisateur.objects.get(username=username)
         except Utilisateur.DoesNotExist:
