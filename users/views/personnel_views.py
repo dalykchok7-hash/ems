@@ -1,13 +1,51 @@
 from rest_framework.views    import APIView
 from rest_framework.response import Response
 from rest_framework          import status
+from rest_framework.pagination import PageNumberPagination
 
-from drf_spectacular.utils import extend_schema, OpenApiParameter
+from drf_spectacular.utils import extend_schema
 from drf_spectacular.types import OpenApiTypes
 
 from users.permissions  import IsAdmin
 from users.models       import Utilisateur
-from users.serializers  import UtilisateurSerializer
+from users.serializers  import UtilisateurSerializer, CreerPersonnelSerializer
+from users.services     import AuthService
+
+
+class CreerPersonnelView(APIView):
+    permission_classes = [IsAdmin]
+
+    @extend_schema(
+        summary   = 'Créer un membre du personnel',
+        request   = CreerPersonnelSerializer,
+        responses = {
+            201: UtilisateurSerializer,
+            400: OpenApiTypes.OBJECT,
+            403: OpenApiTypes.OBJECT,
+        }
+    )
+    def post(self, request):
+        serializer = CreerPersonnelSerializer(data=request.data)
+        if not serializer.is_valid():
+            return Response(
+                serializer.errors,
+                status=status.HTTP_400_BAD_REQUEST
+            )
+
+        try:
+            personnel = AuthService.creer_personnel(
+                serializer.validated_data
+            )
+        except ValueError as e:
+            return Response(
+                {'error': str(e)},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+
+        return Response(
+            UtilisateurSerializer(personnel).data,
+            status=status.HTTP_201_CREATED
+        )
 
 
 class PersonnelListView(APIView):
@@ -18,11 +56,10 @@ class PersonnelListView(APIView):
         responses = {200: UtilisateurSerializer(many=True)}
     )
     def get(self, request):
-        personnel = Utilisateur.objects.filter(
-            role = 'personnel'
+        personnel  = Utilisateur.objects.filter(
+            role='personnel'
         ).order_by('username')
 
-        from rest_framework.pagination import PageNumberPagination
         paginator  = PageNumberPagination()
         page       = paginator.paginate_queryset(personnel, request)
         serializer = UtilisateurSerializer(page, many=True)
@@ -42,8 +79,23 @@ class PersonnelDetailView(APIView):
             return None
 
     @extend_schema(
+        summary   = 'Détail d\'un membre du personnel',
+        responses = {
+            200: UtilisateurSerializer,
+            404: OpenApiTypes.OBJECT,
+        }
+    )
+    def get(self, request, personnel_id):
+        personnel = self.get_object(personnel_id)
+        if not personnel:
+            return Response(
+                {'error': 'Personnel non trouvé'},
+                status=status.HTTP_404_NOT_FOUND
+            )
+        return Response(UtilisateurSerializer(personnel).data)
+
+    @extend_schema(
         summary   = 'Modifier un membre du personnel',
-        request   = None,
         responses = {
             200: UtilisateurSerializer,
             404: OpenApiTypes.OBJECT,
@@ -58,8 +110,8 @@ class PersonnelDetailView(APIView):
             )
 
         champs_modifiables = [
-            'first_name', 'last_name', 'telephone',
-            'shift', 'date_embauche'
+            'first_name', 'last_name',
+            'telephone', 'shift', 'date_embauche'
         ]
 
         for champ in champs_modifiables:
@@ -70,7 +122,7 @@ class PersonnelDetailView(APIView):
         return Response(UtilisateurSerializer(personnel).data)
 
     @extend_schema(
-        summary   = 'Désactiver un membre du personnel',
+        summary   = 'Activer / Désactiver un membre du personnel',
         request   = None,
         responses = {
             200: OpenApiTypes.OBJECT,
@@ -90,6 +142,28 @@ class PersonnelDetailView(APIView):
 
         statut = 'activé' if personnel.is_active else 'désactivé'
         return Response({
-            'message' : f"Compte {statut} avec succès",
+            'message'  : f"Compte {statut} avec succès",
             'is_active': personnel.is_active
         })
+
+    @extend_schema(
+        summary   = 'Supprimer un membre du personnel',
+        request   = None,
+        responses = {
+            200: OpenApiTypes.OBJECT,
+            404: OpenApiTypes.OBJECT,
+        }
+    )
+    def delete(self, request, personnel_id):
+        personnel = self.get_object(personnel_id)
+        if not personnel:
+            return Response(
+                {'error': 'Personnel non trouvé'},
+                status=status.HTTP_404_NOT_FOUND
+            )
+
+        personnel.delete()
+        return Response(
+            {'message': 'Personnel supprimé avec succès'},
+            status=status.HTTP_200_OK
+        )
