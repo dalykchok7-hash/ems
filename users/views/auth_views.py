@@ -9,7 +9,7 @@ from drf_spectacular.types import OpenApiTypes
 from rest_framework_simplejwt.tokens     import RefreshToken
 from rest_framework_simplejwt.exceptions import TokenError
 
-from users.serializers   import LoginSerializer
+from users.serializers   import LoginSerializer,LogoutSerializer
 from users.services      import AuthService
 from users.models        import Utilisateur
 from historique.services import HistoriqueService
@@ -54,7 +54,7 @@ class LogoutView(APIView):
 
     @extend_schema(
         summary   = 'Déconnexion',
-        request   = None,
+        request   = LogoutSerializer,
         responses = {
             200: OpenApiTypes.OBJECT,
             400: OpenApiTypes.OBJECT,
