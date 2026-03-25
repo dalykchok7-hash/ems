@@ -14,9 +14,11 @@ from rest_framework.pagination import PageNumberPagination
 from seances.models import Reservation
 from django.db.models import Count
 from datetime import date
+from rest_framework.parsers import MultiPartParser, FormParser, JSONParser
 
 class ClientListView(APIView):
     permission_classes = [IsAdminOrPersonnel]
+    parser_classes     = [MultiPartParser, FormParser, JSONParser]
 
     @extend_schema(
         summary     = 'Liste des clients',

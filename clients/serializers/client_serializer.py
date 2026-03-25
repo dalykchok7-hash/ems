@@ -53,12 +53,14 @@ class ClientSerializer(ClientValidationMixin, serializers.ModelSerializer):
 
 # ── Serializer création ──────────────────────
 class CreerClientSerializer(ClientValidationMixin, serializers.Serializer):
-
-    nom         = serializers.CharField(max_length=100)
-    prenom      = serializers.CharField(max_length=100)
-    cin         = serializers.CharField(max_length=20)
-    telephone_1 = serializers.CharField(max_length=20)
-
+    nom            = serializers.CharField(max_length=100)
+    prenom         = serializers.CharField(max_length=100)
+    cin            = serializers.CharField(max_length=20)
+    telephone_1    = serializers.CharField(max_length=20)
+    telephone_2    = serializers.CharField(max_length=20,  required=False, default='')
+    email          = serializers.EmailField(required=False, default='')
+    date_naissance = serializers.DateField(required=False,  allow_null=True, default=None)
+    photo          = serializers.ImageField(required=False,  allow_null=True, default=None)
 
 # ── Serializer modification ──────────────────
 class ModifierClientSerializer(ClientValidationMixin, serializers.Serializer):

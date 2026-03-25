@@ -17,7 +17,9 @@ class ClientService:
             telephone_2    = data.get('telephone_2', ''),
             email          = data.get('email', ''),
             date_naissance = data.get('date_naissance', None),
-        )
+            photo          = data.get('photo', None),    # ← ajouter
+    )
+        
         return client
 
     @staticmethod
