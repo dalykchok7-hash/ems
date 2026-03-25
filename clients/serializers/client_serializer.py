@@ -56,7 +56,7 @@ class CreerClientSerializer(ClientValidationMixin, serializers.Serializer):
     nom            = serializers.CharField(max_length=100)
     prenom         = serializers.CharField(max_length=100)
     cin            = serializers.CharField(max_length=20)
-    telephone_1    = serializers.CharField(max_length=20)
+    telephone_1    = serializers.CharField(max_length=20,allow_blank=True)
     telephone_2    = serializers.CharField(max_length=20,  required=False, default='')
     email          = serializers.EmailField(required=False, default='')
     date_naissance = serializers.DateField(required=False,  allow_null=True, default=None)

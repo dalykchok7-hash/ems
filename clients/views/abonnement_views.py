@@ -34,34 +34,37 @@ class AbonnementClientView(APIView):
             )
 
         abonnement = client.abonnement_actif
+
         if not abonnement:
             return Response(
         {
-            "abonnement": None
+            "nom_pack": None,
+                    "date_debut": None,
+                    "date_fin": None,
+                    "seances_total": 0,
+                    "seances_utilisees": 0,
+                    "seances_restantes": 0,
+                    "statut": None
         },
          status=status.HTTP_200_OK
         )
 
-        serializer = AbonnementSerializer(abonnement)
-        data = serializer.data
-        # 🔥 AJOUTS DEMANDÉS PAR FRONT
         seances_total = abonnement.seances_total
         seances_restantes = abonnement.seances_restantes
         seances_utilisees = seances_total - seances_restantes
 
-        progression = 0
-        if seances_total > 0:
-            progression = (seances_utilisees / seances_total) * 100
+        # 🔥 RÉPONSE FORMAT FRONT
+        data = {
+            "nom_pack": abonnement.get_type_display(),
+            "date_debut": abonnement.date_debut,
+            "date_fin": abonnement.date_expiration,
+            "seances_total": seances_total,
+            "seances_utilisees": seances_utilisees,
+            "seances_restantes": seances_restantes,
+            "statut": abonnement.statut
+        }
 
-        data.update({
-        "nom_pack": abonnement.get_type_display(),
-        "date_debut": abonnement.date_debut,
-        "date_fin": abonnement.date_expiration,
-        "seances_utilisees": seances_utilisees,
-        "progression": round(progression, 2),
-        "peut_reserver": seances_restantes > 0
-        })
-        return Response(data,status=status.HTTP_200_OK)
+        return Response(data, status=status.HTTP_200_OK)
 
     @extend_schema(
         summary   = 'Créer un abonnement',
