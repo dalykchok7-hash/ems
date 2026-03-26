@@ -21,6 +21,14 @@ class Reservation(models.Model):
         ('i-model',  'i-Model'),
     ]
 
+    TAILLE_GILET_CHOICES = [
+        
+        ('S',  'S'),
+        ('M',  'M'),
+        ('L',  'L'),
+        
+    ]
+
     # ── Clé primaire ─────────────────────────
     id = models.UUIDField(
         primary_key=True,
@@ -51,6 +59,14 @@ class Reservation(models.Model):
     type_appareil = models.CharField(
         max_length=10,
         choices=TYPE_APPAREIL_CHOICES
+    )
+
+    taille_gilet = models.CharField(
+        max_length=3,
+        choices=TAILLE_GILET_CHOICES,
+        null=True,
+        blank=True,
+        default=None,
     )
 
     statut = models.CharField(

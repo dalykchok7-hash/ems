@@ -108,6 +108,7 @@ class SeanceReservationsView(APIView):
                 seance        = serializer.validated_data['seance'],
                 type_appareil = serializer.validated_data['type_appareil'],
                 personnel     = request.user,
+                taille_gilet  = serializer.validated_data.get('taille_gilet'),
             )
         except ValueError as e:
             return Response(

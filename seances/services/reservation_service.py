@@ -4,7 +4,7 @@ from seances.models import Reservation
 class ReservationService:
 
     @staticmethod
-    def creer_reservation(abonnement, seance, type_appareil, personnel):
+    def creer_reservation(abonnement, seance, type_appareil, personnel, taille_gilet=None):
         deja_reserve = Reservation.objects.filter(
             abonnement__client = abonnement.client,
             seance             = seance,
@@ -21,6 +21,7 @@ class ReservationService:
             seance        = seance,
             personnel     = personnel,
             type_appareil = type_appareil,
+            taille_gilet  = taille_gilet,
             statut        = 'en_attente',
         )
 

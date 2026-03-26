@@ -21,6 +21,7 @@ class ReservationSerializer(serializers.ModelSerializer):
             'seance_info',
             'personnel',
             'type_appareil',
+            'taille_gilet',
             'type_label',
             'statut',
             'statut_label',
@@ -51,6 +52,10 @@ class CreerReservationSerializer(serializers.Serializer):
     seance_id     = serializers.UUIDField()
     type_appareil = serializers.ChoiceField(
                         choices=['i-motion', 'i-model']
+                    )
+    taille_gilet  = serializers.ChoiceField(
+                        choices=[ 'S', 'M', 'L'],
+                        required=False
                     )
 
     def validate(self, data):
@@ -92,3 +97,4 @@ class CreerReservationSerializer(serializers.Serializer):
 class CreerReservationSwaggerSerializer(serializers.Serializer):
     abonnement_id = serializers.UUIDField()
     type_appareil = serializers.ChoiceField(choices=['i-motion', 'i-model'])
+    taille_gilet  = serializers.ChoiceField(choices=['S', 'M', 'L'], required=False)

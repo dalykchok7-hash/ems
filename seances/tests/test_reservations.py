@@ -67,15 +67,18 @@ class ReservationTestCase(TestCase):
         response = self.client_api.post(self.url_reservations, {
             'abonnement_id': str(self.abonnement.id),
             'type_appareil': 'i-motion',
+            'taille_gilet': 'M',
         })
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
         self.assertEqual(response.data['statut'], 'en_attente')
         self.assertEqual(response.data['type_appareil'], 'i-motion')
+        self.assertEqual(response.data['taille_gilet'], 'M')
 
     def test_places_decrementees_apres_reservation(self):
         self.client_api.post(self.url_reservations, {
             'abonnement_id': str(self.abonnement.id),
             'type_appareil': 'i-motion',
+            'taille_gilet': 'M',
         })
         self.seance.refresh_from_db()
         self.assertEqual(self.seance.places_disponibles, 4)
@@ -85,11 +88,13 @@ class ReservationTestCase(TestCase):
         self.client_api.post(self.url_reservations, {
             'abonnement_id': str(self.abonnement.id),
             'type_appareil': 'i-motion',
+            'taille_gilet': 'M',
         })
         # Deuxième réservation dans le même créneau
         response = self.client_api.post(self.url_reservations, {
             'abonnement_id': str(self.abonnement.id),
             'type_appareil': 'i-model',
+            'taille_gilet': 'M',
         })
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
         self.assertIn('error', response.data)
@@ -102,6 +107,7 @@ class ReservationTestCase(TestCase):
         response = self.client_api.post(self.url_reservations, {
             'abonnement_id': str(self.abonnement.id),
             'type_appareil': 'i-motion',
+            'taille_gilet': 'M',
         })
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
 
@@ -112,6 +118,7 @@ class ReservationTestCase(TestCase):
         response = self.client_api.post(self.url_reservations, {
             'abonnement_id': str(self.abonnement.id),
             'type_appareil': 'i-motion',
+            'taille_gilet': 'M',
         })
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
 
@@ -122,6 +129,7 @@ class ReservationTestCase(TestCase):
         res = self.client_api.post(self.url_reservations, {
             'abonnement_id': str(self.abonnement.id),
             'type_appareil': 'i-motion',
+            'taille_gilet': 'M',
         })
         reservation_id = res.data['id']
 
@@ -137,6 +145,7 @@ class ReservationTestCase(TestCase):
         res = self.client_api.post(self.url_reservations, {
             'abonnement_id': str(self.abonnement.id),
             'type_appareil': 'i-motion',
+            'taille_gilet': 'M',
         })
         reservation_id = res.data['id']
 
@@ -151,6 +160,7 @@ class ReservationTestCase(TestCase):
         res = self.client_api.post(self.url_reservations, {
             'abonnement_id': str(self.abonnement.id),
             'type_appareil': 'i-motion',
+            'taille_gilet': 'M',
         })
         reservation_id = res.data['id']
 
@@ -168,6 +178,7 @@ class ReservationTestCase(TestCase):
         res = self.client_api.post(self.url_reservations, {
             'abonnement_id': str(self.abonnement.id),
             'type_appareil': 'i-motion',
+            'taille_gilet': 'M',
         })
         reservation_id = res.data['id']
 
@@ -181,6 +192,7 @@ class ReservationTestCase(TestCase):
         res = self.client_api.post(self.url_reservations, {
             'abonnement_id': str(self.abonnement.id),
             'type_appareil': 'i-motion',
+            'taille_gilet': 'M',
         })
         reservation_id = res.data['id']
 
@@ -194,6 +206,7 @@ class ReservationTestCase(TestCase):
         res = self.client_api.post(self.url_reservations, {
             'abonnement_id': str(self.abonnement.id),
             'type_appareil': 'i-motion',
+            'taille_gilet': 'M',
         })
         reservation_id = res.data['id']
 
@@ -209,6 +222,7 @@ class ReservationTestCase(TestCase):
         res = self.client_api.post(self.url_reservations, {
             'abonnement_id': str(self.abonnement.id),
             'type_appareil': 'i-motion',
+            'taille_gilet': 'M',
         })
         reservation_id = res.data['id']
 
@@ -222,6 +236,7 @@ class ReservationTestCase(TestCase):
         res = self.client_api.post(self.url_reservations, {
             'abonnement_id': str(self.abonnement.id),
             'type_appareil': 'i-motion',
+            'taille_gilet': 'M',
         })
         reservation_id = res.data['id']
 
@@ -254,6 +269,7 @@ class ReservationTestCase(TestCase):
             response = self.client_api.post(self.url_reservations, {
                 'abonnement_id': str(abo.id),
                 'type_appareil': 'i-motion',
+                'taille_gilet': 'M',
             })
             self.assertEqual(response.status_code, status.HTTP_201_CREATED)
 
@@ -281,11 +297,31 @@ class ReservationTestCase(TestCase):
             self.client_api.post(self.url_reservations, {
                 'abonnement_id': str(abo.id),
                 'type_appareil': 'i-motion',
+                'taille_gilet': 'M',
             })
 
         # 6ème réservation doit être refusée
         response = self.client_api.post(self.url_reservations, {
             'abonnement_id': str(self.abonnement.id),
             'type_appareil': 'i-motion',
+            'taille_gilet': 'M',
+        })
+        self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
+
+    def test_creer_reservation_sans_taille_ok(self):
+        # POST sans taille_gilet doit réussir
+        response = self.client_api.post(self.url_reservations, {
+            'abonnement_id': str(self.abonnement.id),
+            'type_appareil': 'i-motion',
+        })
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+        self.assertIsNone(response.data.get('taille_gilet'))
+
+    def test_creer_reservation_taille_invalide(self):
+        # Taille invalide doit retourner 400
+        response = self.client_api.post(self.url_reservations, {
+            'abonnement_id': str(self.abonnement.id),
+            'type_appareil': 'i-motion',
+            'taille_gilet': 'XXL',
         })
         self.assertEqual(response.status_code, status.HTTP_400_BAD_REQUEST)
