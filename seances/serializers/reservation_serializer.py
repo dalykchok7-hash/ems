@@ -9,6 +9,7 @@ class ReservationSerializer(serializers.ModelSerializer):
     seance_info  = serializers.SerializerMethodField()
     type_label   = serializers.SerializerMethodField()
     statut_label = serializers.SerializerMethodField()
+    seance_id = serializers.IntegerField(source='seance.id', read_only=True)
 
     class Meta:
         model  = Reservation
@@ -17,7 +18,6 @@ class ReservationSerializer(serializers.ModelSerializer):
             'abonnement',
             'client_nom',
             'client_cin',
-            'seance',
             'seance_info',
             'personnel',
             'type_appareil',
@@ -26,6 +26,7 @@ class ReservationSerializer(serializers.ModelSerializer):
             'statut',
             'statut_label',
             'created_at',
+            'seance_id',
         ]
         read_only_fields = ['statut', 'created_at']
 
