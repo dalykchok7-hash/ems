@@ -38,6 +38,7 @@ class AbonnementClientView(APIView):
         if not abonnement:
             return Response(
         {
+            "id": None,   # ← ajoute ça aussi
             "nom_pack": None,
                     "date_debut": None,
                     "date_fin": None,
@@ -55,6 +56,7 @@ class AbonnementClientView(APIView):
 
         # 🔥 RÉPONSE FORMAT FRONT
         data = {
+            "id": abonnement.id,   # ← ajoute ça
             "nom_pack": abonnement.get_type_display(),
             "date_debut": abonnement.date_debut,
             "date_fin": abonnement.date_expiration,
