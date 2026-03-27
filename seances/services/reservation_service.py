@@ -62,7 +62,6 @@ class ReservationService:
         seance = reservation.seance
         seance.places_disponibles += 1
         seance.save()
-
         return reservation
 
     @staticmethod

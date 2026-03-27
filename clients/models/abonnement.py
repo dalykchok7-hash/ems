@@ -7,9 +7,11 @@ class Abonnement(models.Model):
 
     TYPE_CHOICES = [
     ('essai',   'Essai'),
-    ('normale', 'Normale'),
+    ('unique', 'Unique'),
+    ('pack5',  'Pack 5'),
     ('pack10',  'Pack 10'),
     ('pack20',  'Pack 20'),
+    ('pack30',  'Pack 30'),
 ]
 
     MODE_PAIEMENT_CHOICES = [
@@ -25,17 +27,21 @@ class Abonnement(models.Model):
     ]
 
     SEANCES_PAR_TYPE = {
-        'essai':   1,
-        'normale': 1,
-        'pack10':  10,
-        'pack20':  20,
+        'essai': 1,
+        'unique':1,
+        'pack5' :5,
+        'pack10':10,
+        'pack20':20,
+        'pack30':30,
     }
 
     PRIX_PAR_TYPE = {
-        'essai':   0,
-        'normale': 40,
-        'pack10':  350,
-        'pack20':  650,
+        'essai':45,
+        'unique':60,
+        'pack5' :250,
+        'pack10':550,
+        'pack20':920,
+        'pack30':1150,
     }
 
     # ── Clé primaire ─────────────────────────
