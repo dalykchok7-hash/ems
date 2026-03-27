@@ -48,7 +48,7 @@ class AbonnementSerializer(serializers.ModelSerializer):
 class CreerAbonnementSerializer(serializers.Serializer):
 
     type          = serializers.ChoiceField(
-                        choices=['essai', 'normale', 'pack10', 'pack20']
+                        choices=['essai','unique', 'pack5', 'pack10', 'pack20','pack30']
                     )
     mode_paiement = serializers.ChoiceField(
                         choices=['cash', 'tpe'],
