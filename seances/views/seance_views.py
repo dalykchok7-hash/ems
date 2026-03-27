@@ -71,7 +71,7 @@ class SeanceReservationsView(APIView):
                 status=status.HTTP_404_NOT_FOUND
             )
         reservations = seance.reservations.filter(
-            statut__in=['en_attente', 'present','absent']
+            statut__in=['en_attente', 'present','absent','annule']
         ).select_related('abonnement__client')
 
         serializer = ReservationSerializer(reservations, many=True)
