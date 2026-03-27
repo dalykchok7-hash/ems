@@ -11,21 +11,20 @@ from clients.views import (
 )
 
 urlpatterns = [
-    path('',
-         ClientListView.as_view(),
-         name='client-list'),
 
+    # ✅ IMPORTANT — mettre AVANT <str:cin>
+    path('abonnements/',
+         AbonnementListView.as_view(),
+         name='abonnement-list'),
+
+    path('abonnements/<uuid:abonnement_id>/',
+         AbonnementDetailView.as_view(),
+         name='abonnement-detail'),
+
+    # autres routes
     path('stats/',
          ClientStatsView.as_view(),
          name='client-stats'),
-
-    path('<str:cin>/',
-         ClientDetailView.as_view(),
-         name='client-detail'),
-
-    path('<str:cin>/seances/',
-         ClientSeancesView.as_view(),
-         name='client-seances'),
 
     path('<str:cin>/abonnement/',
          AbonnementClientView.as_view(),
@@ -35,11 +34,15 @@ urlpatterns = [
          AbonnementHistoriqueView.as_view(),
          name='abonnement-historique'),
 
-    path('abonnements/',
-         AbonnementListView.as_view(),
-         name='abonnement-list'),
+    path('<str:cin>/seances/',
+         ClientSeancesView.as_view(),
+         name='client-seances'),
 
-    path('abonnements/<uuid:abonnement_id>/',
-         AbonnementDetailView.as_view(),
-         name='abonnement-detail'),
+    path('<str:cin>/',
+         ClientDetailView.as_view(),
+         name='client-detail'),
+
+    path('',
+         ClientListView.as_view(),
+         name='client-list'),
 ]
