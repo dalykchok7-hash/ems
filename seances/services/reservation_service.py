@@ -1,6 +1,4 @@
 from seances.models import Reservation
-
-
 class ReservationService:
 
     @staticmethod
@@ -35,25 +33,18 @@ class ReservationService:
     def marquer_present(reservation):
 
         if reservation.statut == 'present':
-         return reservation  # rien à faire
+            raise ValueError("Déjà présent")
 
-    # 🔁 si absent → on reprend la place
-        if reservation.statut == 'absent':
-            reservation.seance.places_disponibles -= 1
-            reservation.seance.save()
+    # 🔥 Si il était absent/annulé → reprendre place
+        if reservation.statut in ['absent', 'annule']:
+            if reservation.seance.places_disponibles <= 0:
+                raise ValueError("Plus de places disponibles")
 
-    # ❌ si annulé → interdit
-        if reservation.statut == 'annule':
-            raise ValueError("Impossible de marquer une réservation annulée")
+        reservation.seance.places_disponibles -= 1
+        reservation.seance.save()
 
         reservation.statut = 'present'
         reservation.save()
-
-    # ⚠️ décrémenter seulement une fois
-        abonnement = reservation.abonnement
-        if reservation.statut != 'present':  # sécurité inutile ici mais ok
-            abonnement.seances_restantes -= 1
-            abonnement.save()
 
         return reservation
 
@@ -85,23 +76,12 @@ class ReservationService:
     def annuler(reservation):
 
         if reservation.statut == 'annule':
-            return reservation
+            raise ValueError("Déjà annulée")
 
-    # ❌ interdit si déjà consommé (optionnel selon business)
-    # if reservation.statut == 'present':
-    #     raise ValueError("Impossible d'annuler une séance déjà effectuée")
-
-    # 🔁 si present → remettre séance
-        if reservation.statut == 'present':
-            reservation.abonnement.seances_restantes += 1
-            reservation.abonnement.save()
-
-    # 🔁 si en_attente → libérer place
-        if reservation.statut == 'en_attente':
+    # 🔥 Si la place était occupée → libérer
+        if reservation.statut in ['en_attente', 'present']:
             reservation.seance.places_disponibles += 1
             reservation.seance.save()
-
-    # 🔁 si absent → ne rien faire (déjà libéré)
 
         reservation.statut = 'annule'
         reservation.save()
