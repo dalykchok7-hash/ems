@@ -1,30 +1,37 @@
 from seances.models import Reservation
+from django.db import transaction
+from django.db.models import F
+
 class ReservationService:
 
     @staticmethod
     def creer_reservation(abonnement, seance, type_appareil, personnel, taille_gilet=None):
-        deja_reserve = Reservation.objects.filter(
-            abonnement__client = abonnement.client,
-            seance             = seance,
-            statut__in         = ['en_attente', 'present']
-        ).exists()
-        if deja_reserve:
-            raise ValueError(
-            "Ce client a déjà une réservation dans ce créneau"
-        )
-        # Créer la réservation
+        with transaction.atomic():
 
+        # Vérifier doublon
+            if Reservation.objects.filter(
+                abonnement=abonnement,
+                seance=seance,
+                statut__in=['en_attente', 'present']
+            ).exists():
+                raise ValueError("Client déjà réservé")
+
+        # Vérifier places
+        if seance.places_disponibles <= 0:
+            raise ValueError("Créneau complet")
+
+        # Créer réservation
         reservation = Reservation.objects.create(
-            abonnement    = abonnement,
-            seance        = seance,
-            personnel     = personnel,
-            type_appareil = type_appareil,
-            taille_gilet  = taille_gilet,
-            statut        = 'en_attente',
+            abonnement=abonnement,
+            seance=seance,
+            personnel=personnel,
+            type_appareil=type_appareil,
+            taille_gilet=taille_gilet,
+            statut='en_attente',
         )
 
-        # Décrémenter les places du créneau
-        seance.places_disponibles -= 1
+        # Décrémenter proprement
+        seance.places_disponibles = F('places_disponibles') - 1
         seance.save()
 
         return reservation
