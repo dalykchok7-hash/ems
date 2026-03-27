@@ -2,25 +2,28 @@ from django.urls import path
 from clients.views import (
     ClientListView,
     ClientDetailView,
-    AbonnementClientView,
     ClientSeancesView,
     ClientStatsView,
+    AbonnementClientView,
     AbonnementHistoriqueView,
     AbonnementDetailView,
+    AbonnementListView,
 )
 
 urlpatterns = [
     path('',
          ClientListView.as_view(),
          name='client-list'),
-     path('stats/',
+
+    path('stats/',
          ClientStatsView.as_view(),
          name='client-stats'),
+
     path('<str:cin>/',
          ClientDetailView.as_view(),
          name='client-detail'),
 
-     path('<str:cin>/seances/',
+    path('<str:cin>/seances/',
          ClientSeancesView.as_view(),
          name='client-seances'),
 
@@ -31,6 +34,10 @@ urlpatterns = [
     path('<str:cin>/abonnements/',
          AbonnementHistoriqueView.as_view(),
          name='abonnement-historique'),
+
+    path('abonnements/',
+         AbonnementListView.as_view(),
+         name='abonnement-list'),
 
     path('abonnements/<uuid:abonnement_id>/',
          AbonnementDetailView.as_view(),

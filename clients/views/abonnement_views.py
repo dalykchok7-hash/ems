@@ -2,10 +2,10 @@ from historique.services.historique_service import HistoriqueService
 from rest_framework.views    import APIView
 from rest_framework.response import Response
 from rest_framework          import status
-
+from clients.models import Abonnement
 from drf_spectacular.utils import extend_schema, OpenApiParameter
 from drf_spectacular.types import OpenApiTypes
-
+from rest_framework.pagination import PageNumberPagination
 from users.permissions               import IsAdminOrPersonnel
 from clients.serializers             import AbonnementSerializer, CreerAbonnementSerializer, ModifierAbonnementSerializer
 from clients.services                import AbonnementService
@@ -165,3 +165,50 @@ class AbonnementDetailView(APIView):
             )
 
         return Response(resultat)
+class AbonnementListView(APIView):
+    permission_classes = [IsAdminOrPersonnel]
+
+    @extend_schema(
+        summary    = 'Liste de tous les abonnements',
+        parameters = [
+            OpenApiParameter(
+                name        = 'statut',
+                type        = str,
+                location    = OpenApiParameter.QUERY,
+                description = 'Filtrer par statut : actif, en_attente, termine, expire',
+                required    = False,
+            ),
+            OpenApiParameter(
+                name        = 'q',
+                type        = str,
+                location    = OpenApiParameter.QUERY,
+                description = 'Rechercher par nom ou CIN du client',
+                required    = False,
+            ),
+        ],
+        responses  = {200: AbonnementSerializer(many=True)}
+    )
+    def get(self, request):
+        from django.db.models import Q
+
+        abonnements = Abonnement.objects.all().select_related('client').order_by('-created_at')
+
+        # Filtre par statut
+        statut = request.query_params.get('statut', None)
+        if statut:
+            abonnements = abonnements.filter(statut=statut)
+
+        # Recherche par nom ou CIN client
+        q = request.query_params.get('q', None)
+        if q:
+            abonnements = abonnements.filter(
+                Q(client__nom__icontains=q)    |
+                Q(client__prenom__icontains=q) |
+                Q(client__cin__icontains=q)
+            )
+
+        # Pagination
+        paginator  = PageNumberPagination()
+        page       = paginator.paginate_queryset(abonnements, request)
+        serializer = AbonnementSerializer(page, many=True)
+        return paginator.get_paginated_response(serializer.data)
