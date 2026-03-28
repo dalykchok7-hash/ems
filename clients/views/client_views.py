@@ -37,10 +37,10 @@ class ClientListView(APIView):
     def get(self, request):
         q = request.query_params.get('q', None)
         if q:
-            clients = ClientService.rechercher_clients(q).filter(statut='actif')
+            clients = ClientService.rechercher_clients(q)
         else:
-            clients = Client.objects.filter(statut='actif')
-        
+            clients = Client.objects.all()
+
         paginator   = PageNumberPagination()
         page        = paginator.paginate_queryset(clients, request)
         serializer = ClientSerializer(page, many=True)
@@ -148,14 +148,14 @@ class ClientDetailView(APIView):
     def delete(self, request, cin):
         try:
             client = Client.objects.get(cin=cin)
-        
-            client.statut = 'inactif'
-            client.save()
+            ClientService.supprimer_client(client)
+            return Response(status=status.HTTP_204_NO_CONTENT)
 
+        except Exception as e:
             return Response(
-                {'message': 'Client désactivé avec succès'},
-                status=status.HTTP_200_OK
-        )
+            {'error': str(e)},
+            status=status.HTTP_500_INTERNAL_SERVER_ERROR
+            )
 
         except Client.DoesNotExist:
             return Response(

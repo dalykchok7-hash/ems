@@ -54,7 +54,7 @@ class Abonnement(models.Model):
     # ── Relations ────────────────────────────
     client = models.ForeignKey(
         Client,
-        on_delete=models.PROTECT,
+        on_delete=models.CASCADE,
         related_name='abonnements'
     )
 

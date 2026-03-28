@@ -39,7 +39,7 @@ class Reservation(models.Model):
     # ── Relations ────────────────────────────
     abonnement = models.ForeignKey(
         Abonnement,
-        on_delete=models.PROTECT,
+        on_delete=models.CASCADE,
         related_name='reservations'
     )
 
