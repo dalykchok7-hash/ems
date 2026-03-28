@@ -2,6 +2,7 @@ from historique.services.historique_service import HistoriqueService
 from rest_framework.views    import APIView
 from rest_framework.response import Response
 from rest_framework          import status
+from rest_framework.pagination import PageNumberPagination
 from clients.models import Abonnement
 from drf_spectacular.utils import extend_schema, OpenApiParameter
 from drf_spectacular.types import OpenApiTypes
@@ -9,7 +10,7 @@ from rest_framework.pagination import PageNumberPagination
 from users.permissions               import IsAdminOrPersonnel
 from clients.serializers             import AbonnementSerializer, CreerAbonnementSerializer, ModifierAbonnementSerializer
 from clients.services                import AbonnementService
-from clients.models                  import Client
+from clients.models                  import Client, Abonnement
 from historique.services import HistoriqueService
 
 

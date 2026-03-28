@@ -11,7 +11,7 @@ class Command(BaseCommand):
             '--date-debut',
             type    = str,
             default = None,
-            help    = 'Date de début au format YYYY-MM-DD. Par défaut aujourd\'hui.'
+            help    = 'Date de début au format YYYY-MM-DD'
         )
 
     def handle(self, *args, **kwargs):
