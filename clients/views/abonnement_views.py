@@ -64,7 +64,12 @@ class AbonnementClientView(APIView):
             "seances_total": seances_total,
             "seances_utilisees": seances_utilisees,
             "seances_restantes": seances_restantes,
-            "statut": abonnement.statut
+            "statut": abonnement.statut,
+            # ✅ AJOUTS CRITIQUES
+            "mode_paiement": abonnement.mode_paiement,
+            "est_paye": abonnement.est_paye,
+            "prix_paye": str(abonnement.prix_paye),  # 👈 important
+            "reduction": str(abonnement.reduction),  # 👈 important
         }
 
         return Response(data, status=status.HTTP_200_OK)
