@@ -191,14 +191,16 @@ class ClientSeancesView(APIView):
 
         data = [
             {
-                'id'           : str(r.id),
-                'date'         : str(r.seance.date),
-                'heure'        : str(r.seance.heure_debut),
-                'type_appareil': r.type_appareil,
-                'type_label'   : r.get_type_appareil_display(),
-                'statut'       : r.statut,
-                'statut_label' : r.get_statut_display(),
-            }
+            'id'           : str(r.id),
+            'date'         : str(r.seance.date),
+            'heure_debut'  : str(r.seance.heure_debut),  # ← corrigé
+            'heure_fin'    : str(r.seance.heure_fin),     # ← ajouté
+            'type_appareil': r.type_appareil,
+            'type_label'   : r.get_type_appareil_display(),
+            'statut'       : r.statut,
+            'statut_label' : r.get_statut_display(),
+            'taille_gilet' : r.taille_gilet,              # ← ajouté
+    }
             for r in reservations
         ]
 

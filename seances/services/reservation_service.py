@@ -2,6 +2,7 @@ from seances.models import Reservation
 from django.db import transaction
 from django.db.models import  F                  
 from clients.models import Abonnement                     
+
 class ReservationService:
 
     @staticmethod
