@@ -1,7 +1,7 @@
 from seances.models import Reservation
 from django.db import transaction
-from django.db.models import  F                                              
-
+from django.db.models import  F                  
+from clients.models import Abonnement                     
 class ReservationService:
 
     @staticmethod
@@ -43,20 +43,32 @@ class ReservationService:
         ancien_statut = reservation.statut
 
         with transaction.atomic():
-            # Si venait de absent → reprendre une place
+        # Si venait de absent → reprendre une place
             if ancien_statut == 'absent':
                 if reservation.seance.places_disponibles <= 0:
                     raise ValueError("Plus de places disponibles")
-                reservation.seance.places_disponibles -= 1
-                reservation.seance.save()
+            reservation.seance.places_disponibles -= 1
+            reservation.seance.save()
 
-            # Décrémenter séances seulement si pas déjà présent
-            if ancien_statut != 'present':
-                reservation.abonnement.seances_restantes -= 1
-                reservation.abonnement.save()
+        # Décrémenter séances seulement si pas déjà présent
+        if ancien_statut != 'present':
+            abonnement = reservation.abonnement
 
-            reservation.statut = 'present'
-            reservation.save()
+            # Activer l'abonnement si en_attente
+            if abonnement.statut == 'en_attente':
+                abonnement.statut = 'actif'
+
+            # Décrémenter séances
+            abonnement.seances_restantes -= 1
+
+            # Terminer si plus de séances
+            if abonnement.seances_restantes <= 0:
+                abonnement.statut = 'termine'
+
+            abonnement.save()
+
+        reservation.statut = 'present'
+        reservation.save()
 
         return reservation
 
@@ -65,18 +77,22 @@ class ReservationService:
         ancien_statut = reservation.statut
 
         with transaction.atomic():
-            # Libérer place seulement si en_attente ou present
             if ancien_statut in ['en_attente', 'present']:
                 reservation.seance.places_disponibles += 1
                 reservation.seance.save()
 
-            # Remettre séance seulement si venait de present
             if ancien_statut == 'present':
-                reservation.abonnement.seances_restantes += 1
-                reservation.abonnement.save()
+                abonnement = reservation.abonnement
+                abonnement.seances_restantes += 1
 
-            reservation.statut = 'absent'
-            reservation.save()
+            # Réactiver si était terminé
+            if abonnement.statut == 'termine':
+                abonnement.statut = 'actif'
+
+            abonnement.save()
+
+        reservation.statut = 'absent'
+        reservation.save()
 
         return reservation
 
@@ -85,17 +101,22 @@ class ReservationService:
         ancien_statut = reservation.statut
 
         with transaction.atomic():
-            # Libérer place si en_attente ou present
             if ancien_statut in ['en_attente', 'present']:
                 reservation.seance.places_disponibles += 1
                 reservation.seance.save()
 
-            # Remettre séance si venait de present
             if ancien_statut == 'present':
-                reservation.abonnement.seances_restantes += 1
-                reservation.abonnement.save()
+                abonnement = reservation.abonnement
+                abonnement.seances_restantes += 1
+
+            # Réactiver si était terminé
+            if abonnement.statut == 'termine':
+                abonnement.statut = 'actif'
+
+                abonnement.save()
 
             reservation.statut = 'annule'
             reservation.save()
 
         return reservation
+    
