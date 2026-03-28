@@ -21,8 +21,8 @@ class SeanceService:
         for i in range(jours):
             jour = date_debut + timedelta(days=i)
 
-            for heure in range(24):
-                for minute in [0, 30]:
+            for heure in range(8,22):
+                for minute in [0, 30]:  
                     heure_debut = time(heure, minute)
 
                     # Ignorer si existe déjà
@@ -32,10 +32,10 @@ class SeanceService:
                     if minute == 0:
                         heure_fin = time(heure, 30)
                     else:
-                        if heure == 23:
-                            heure_fin = time(0, 0)
-                        else:
-                            heure_fin = time(heure + 1, 0)
+                         heure_fin = time(heure + 1, 0)  # ← 21:30 → 22:00 ✅
+                         
+                    if (jour, heure_debut) in existants:
+                        continue
 
                     seances_a_creer.append(
                         Seance(
