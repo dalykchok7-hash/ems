@@ -138,6 +138,26 @@ class ClientDetailView(APIView):
             )
 
         return Response(ClientSerializer(client).data)
+    @extend_schema(
+    summary='Supprimer un client',
+    responses={
+        204: None,
+        404: OpenApiTypes.OBJECT,
+    }
+)
+    def delete(self, request, cin):
+        try:
+            client = Client.objects.get(cin=cin)
+        except Client.DoesNotExist:
+            return Response(
+            {'error': 'Client non trouvé'},
+            status=status.HTTP_404_NOT_FOUND
+        )
+
+        ClientService.supprimer_client(client)
+
+        return Response(status=status.HTTP_204_NO_CONTENT)
+
 class ClientSeancesView(APIView):
     permission_classes = [IsAdminOrPersonnel]
 

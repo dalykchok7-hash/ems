@@ -1,4 +1,5 @@
 from clients.models import Client
+from seances.models import Reservation
 from django.db.models import Q
 
 
@@ -45,3 +46,22 @@ class ClientService:
             Q(prenom__icontains=query)      |
             Q(telephone_1__icontains=query)
         )
+
+
+    @staticmethod
+    def supprimer_client(client):
+
+        # récupérer les réservations actives
+        reservations = Reservation.objects.filter(
+            abonnement__client=client,
+            statut__in=['en_attente', 'present']
+        ).select_related('seance')
+
+        # libérer les places
+        for r in reservations:
+            seance = r.seance
+            seance.places_disponibles += 1
+            seance.save()
+
+        # supprimer le client (cascade auto)
+        client.delete()
