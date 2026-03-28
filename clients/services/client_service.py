@@ -44,7 +44,8 @@ class ClientService:
             Q(cin__icontains=query)         |
             Q(nom__icontains=query)         |
             Q(prenom__icontains=query)      |
-            Q(telephone_1__icontains=query)
+            Q(telephone_1__icontains=query),
+            filter(statut='actif')
         )
 
 
@@ -64,4 +65,5 @@ class ClientService:
             seance.save()
 
         # supprimer le client (cascade auto)
-        client.delete()
+        client.statut = 'inactif'
+        client.save()

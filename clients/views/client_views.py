@@ -37,10 +37,10 @@ class ClientListView(APIView):
     def get(self, request):
         q = request.query_params.get('q', None)
         if q:
-            clients = ClientService.rechercher_clients(q)
+            clients = ClientService.rechercher_clients(q).filter(statut='actif')
         else:
-            clients = Client.objects.all()
-
+            clients = Client.objects.filter(statut='actif')
+        
         paginator   = PageNumberPagination()
         page        = paginator.paginate_queryset(clients, request)
         serializer = ClientSerializer(page, many=True)
@@ -144,19 +144,24 @@ class ClientDetailView(APIView):
         204: None,
         404: OpenApiTypes.OBJECT,
     }
-)
+    )
     def delete(self, request, cin):
         try:
             client = Client.objects.get(cin=cin)
+        
+            client.statut = 'inactif'
+            client.save()
+
+            return Response(
+                {'message': 'Client désactivé avec succès'},
+                status=status.HTTP_200_OK
+        )
+
         except Client.DoesNotExist:
             return Response(
             {'error': 'Client non trouvé'},
             status=status.HTTP_404_NOT_FOUND
-        )
-
-        ClientService.supprimer_client(client)
-
-        return Response(status=status.HTTP_204_NO_CONTENT)
+            )
 
 class ClientSeancesView(APIView):
     permission_classes = [IsAdminOrPersonnel]
