@@ -81,16 +81,21 @@ class ReservationService:
 
     @staticmethod
     def annuler(reservation):
-
-        if reservation.statut == 'annule':
-            raise ValueError("Déjà annulée")
-
-    # 🔥 Si la place était occupée → libérer
-        if reservation.statut in ['en_attente', 'present']:
-            reservation.seance.places_disponibles += 1
-            reservation.seance.save()
+        if reservation.statut not in ['en_attente', 'present']:  # ← ajouter present
+            raise ValueError(
+            "Seules les réservations en attente ou présentes peuvent être annulées"
+        )
 
         reservation.statut = 'annule'
         reservation.save()
+
+    # Libérer la place du créneau
+        seance = reservation.seance
+        seance.places_disponibles += 1
+        seance.save()
+
+    # Si present → remettre les séances de l'abonnement
+        if reservation.statut == 'annule':
+            pass  # déjà sauvegardé
 
         return reservation
