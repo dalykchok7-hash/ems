@@ -116,8 +116,8 @@ class PersonnelDetailView(APIView):
                 status=status.HTTP_400_BAD_REQUEST
             )
         champs_modifiables = [
-            'first_name', 'last_name',
-            'telephone', 'shift', 'date_embauche'
+            'first_name', 'last_name', 'email',
+            'cin', 'telephone', 'role', 'shift', 'date_embauche'
         ]
 
         for champ, valeur in serializer.validated_data.items():

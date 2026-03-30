@@ -51,11 +51,11 @@ class LoginSerializer(serializers.Serializer):
 class ModifierPersonnelSerializer(serializers.Serializer):
     first_name    = serializers.CharField(max_length=100, required=False)
     last_name     = serializers.CharField(max_length=100, required=False)
-    telephone     = serializers.CharField(max_length=20,  required=False)
-    shift         = serializers.ChoiceField(
-                        choices  = ['jour', 'soir'],
-                        required = False
-                    )
+    email         = serializers.EmailField(required=False)        # ← ajouter
+    cin           = serializers.CharField(max_length=8, required=False)   # ← ajouter
+    telephone     = serializers.CharField(max_length=20, required=False)
+    role          = serializers.ChoiceField(choices=['admin', 'personnel'], required=False)  # ← ajouter
+    shift         = serializers.ChoiceField(choices=['jour', 'soir'], required=False)
     date_embauche = serializers.DateField(required=False)
 class LogoutSerializer(serializers.Serializer):
     refresh = serializers.CharField()
