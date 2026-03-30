@@ -42,6 +42,7 @@ class AuthService:
             password      = data['password'],
             first_name    = data['first_name'],
             last_name     = data['last_name'],
+            email         = data['email'],   # ← ajouter
             cin           = data['cin'],
             telephone     = data.get('telephone', ''),
             role          = 'personnel',
