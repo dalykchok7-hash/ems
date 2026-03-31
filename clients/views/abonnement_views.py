@@ -158,19 +158,22 @@ class AbonnementDetailView(APIView):
             return Response(
                 serializer.errors,
                 status=status.HTTP_400_BAD_REQUEST
-            )
+        )
 
         resultat = AbonnementService.modifier(
             abonnement_id, serializer.validated_data
         )
 
-        if 'error' in resultat:
+        if isinstance(resultat, dict) and 'error' in resultat:
             return Response(
                 resultat,
-                status=status.HTTP_400_BAD_REQUEST
-            )
+                status=status.HTTP_404_NOT_FOUND
+        )
 
-        return Response(resultat)
+        return Response(
+            AbonnementSerializer(resultat).data,
+            status=status.HTTP_200_OK
+        )
 class AbonnementListView(APIView):
     permission_classes = [IsAdminOrPersonnel]
 

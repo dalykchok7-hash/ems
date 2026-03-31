@@ -21,9 +21,19 @@ class AbonnementService:
         return abonnement
 
     @staticmethod
-    def modifier_abonnement(abonnement, data):
-        for champ in ['mode_paiement', 'est_paye',
-                      'date_paiement', 'date_expiration', 'reduction']:
+    def modifier(abonnement_id, data):
+        try:
+            abonnement = Abonnement.objects.get(id=abonnement_id)
+        except Abonnement.DoesNotExist:
+            return {'error': 'Abonnement introuvable'}
+
+        for champ in [
+            'mode_paiement',
+            'est_paye',
+            'date_paiement',
+            'date_expiration',
+            'reduction'
+        ]:
             if champ in data:
                 setattr(abonnement, champ, data[champ])
 
