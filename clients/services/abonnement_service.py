@@ -39,7 +39,15 @@ class AbonnementService:
 
         abonnement.save()
         return abonnement
+    @staticmethod
+    def supprimer(abonnement_id):
+        try:
+            abonnement = Abonnement.objects.get(id=abonnement_id)
+        except Abonnement.DoesNotExist:
+            return {'error': 'Abonnement introuvable'}
 
+        abonnement.delete()
+        return {'message': 'Abonnement supprimé avec succès'}
     @staticmethod
     def historique_abonnements(client):
         return Abonnement.objects.filter(

@@ -174,6 +174,27 @@ class AbonnementDetailView(APIView):
             AbonnementSerializer(resultat).data,
             status=status.HTTP_200_OK
         )
+    @extend_schema(
+    summary="Supprimer un abonnement",
+    description="Supprime un abonnement via son ID",
+    responses={
+        200: OpenApiTypes.OBJECT,
+        404: OpenApiTypes.OBJECT,
+    }
+    )
+    def delete(self, request, abonnement_id):
+        resultat = AbonnementService.supprimer(abonnement_id)
+
+        if isinstance(resultat, dict) and 'error' in resultat:
+            return Response(
+            resultat,
+            status=status.HTTP_404_NOT_FOUND
+            )
+
+        return Response(
+        resultat,
+        status=status.HTTP_200_OK
+    )
 class AbonnementListView(APIView):
     permission_classes = [IsAdminOrPersonnel]
 
