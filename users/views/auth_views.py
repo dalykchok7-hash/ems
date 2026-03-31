@@ -26,26 +26,38 @@ class LoginView(APIView):
             401: OpenApiTypes.OBJECT,
         }
     )
-    def post(self, request): 
-        serializer = LoginSerializer(data=request.data) 
-        serializer.is_valid(raise_exception=True) 
+    def post(self, request):
+        serializer = LoginSerializer(data=request.data)
 
-        username = serializer.validated_data['username'] 
-        password = serializer.validated_data['password'] 
-        try: 
-            resultat = AuthService.login( 
-                username=username, 
-                password=password, 
-            ) 
-        except ValueError as e: 
-            return Response( 
-                {'error': str(e)},
-                    status=status.HTTP_401_UNAUTHORIZED 
-                )
-        try: 
-            HistoriqueService.connexion(resultat.get('instance')) 
-        except Exception: 
-                pass 
+        if not serializer.is_valid():
+            return Response(
+                serializer.errors,
+                status=status.HTTP_401_UNAUTHORIZED
+            )
+
+        username = serializer.validated_data['username']
+        password = serializer.validated_data['password']
+
+        try:
+            resultat = AuthService.login(
+                username=username,
+                password=password,
+            )
+        except ValueError as e:
+            return Response(
+            {'error': str(e)},
+            status=status.HTTP_401_UNAUTHORIZED
+            )
+
+    # ✅ Historique (sans casser l'app)
+        try:
+            HistoriqueService.connexion(resultat.get('instance'))
+        except Exception:
+            pass
+
+    # ❗ IMPORTANT → ne pas renvoyer "instance" au frontend
+        resultat.pop('instance', None)
+
         return Response(resultat, status=status.HTTP_200_OK)
 
 

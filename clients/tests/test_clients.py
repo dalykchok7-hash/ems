@@ -57,7 +57,8 @@ class ClientTestCase(TestCase):
         )
         response = self.client_api.get('/api/clients/')
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertIsInstance(response.data, list)
+        self.assertIn('results', response.data)
+        self.assertIsInstance(response.data['results'], list)
 
     def test_liste_clients_sans_token_refuse(self):
         self.client_api.credentials()
@@ -79,7 +80,7 @@ class ClientTestCase(TestCase):
         )
         response = self.client_api.get('/api/clients/?q=Ben Ali')
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertGreater(len(response.data), 0)
+        self.assertGreater(len(response.data['results']), 0)
 
     def test_recherche_par_cin(self):
         self.client_api.credentials(
@@ -87,7 +88,7 @@ class ClientTestCase(TestCase):
         )
         response = self.client_api.get('/api/clients/?q=12345678')
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertEqual(len(response.data), 1)
+        self.assertEqual(len(response.data['results']), 1)
 
     def test_recherche_inexistante(self):
         self.client_api.credentials(
@@ -95,7 +96,7 @@ class ClientTestCase(TestCase):
         )
         response = self.client_api.get('/api/clients/?q=xxxxxxxx')
         self.assertEqual(response.status_code, status.HTTP_200_OK)
-        self.assertEqual(len(response.data), 0)
+        self.assertEqual(len(response.data['results']), 0)
 
     # ── Tests créer client ───────────────────
 

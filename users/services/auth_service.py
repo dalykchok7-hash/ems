@@ -26,7 +26,8 @@ class AuthService:
                 'id'  : str(user.id),
                 'role': user.role,
                 'nom' : user.get_full_name(),
-            }
+            },
+            'instance': user
         }
 
     @staticmethod

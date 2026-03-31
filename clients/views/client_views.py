@@ -15,6 +15,7 @@ from seances.models import Reservation
 from django.db.models import Count
 from datetime import date
 from rest_framework.parsers import MultiPartParser, FormParser, JSONParser
+from django.db.models import Q
 
 class ClientListView(APIView):
     permission_classes = [IsAdminOrPersonnel]
@@ -37,7 +38,13 @@ class ClientListView(APIView):
     def get(self, request):
         q = request.query_params.get('q', None)
         if q:
-            clients = ClientService.rechercher_clients(q)
+            clients = Client.objects.filter(
+                Q(nom__icontains=q) |
+                Q(prenom__icontains=q) |
+                Q(cin__icontains=q) |
+                Q(telephone_1__icontains=q) |
+                Q(telephone_2__icontains=q)
+            )
         else:
             clients = Client.objects.all()
 
