@@ -41,7 +41,8 @@ class HistoriqueListView(APIView):
                 )
             historiques = HistoriqueService.liste(date_filtre)
         else:
-            date_debut = date.today() - timedelta(days=7)
-            historiques = HistoriqueService.liste_semaine(date_debut)
+            historiques = HistoriqueService.liste_semaine()
+
+           
             serializer  = HistoriqueSerializer(historiques, many=True)
         return Response(serializer.data)
