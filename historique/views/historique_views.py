@@ -2,7 +2,7 @@ from rest_framework.views    import APIView
 from rest_framework.response import Response
 from rest_framework          import status
 from datetime                import date
-
+from datetime import date, timedelta
 from drf_spectacular.utils import extend_schema, OpenApiParameter
 from drf_spectacular.types import OpenApiTypes
 
@@ -39,9 +39,9 @@ class HistoriqueListView(APIView):
                     {'error': 'Format date invalide. Utilisez YYYY-MM-DD'},
                     status=status.HTTP_400_BAD_REQUEST
                 )
+            historiques = HistoriqueService.liste(date_filtre)
         else:
-            date_filtre = date.today()
-
-        historiques = HistoriqueService.liste(date_filtre)
-        serializer  = HistoriqueSerializer(historiques, many=True)
+            date_debut = date.today() - timedelta(days=7)
+            historiques = HistoriqueService.liste_semaine(date_debut)
+            serializer  = HistoriqueSerializer(historiques, many=True)
         return Response(serializer.data)

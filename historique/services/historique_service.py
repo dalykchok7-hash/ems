@@ -109,3 +109,13 @@ class HistoriqueService:
             )
 
         return historiques
+    @staticmethod
+    def liste_semaine(date_debut):
+        """Retourne les historiques des 7 derniers jours."""
+        from datetime import date
+        historiques = Historique.objects.all().select_related('personnel')
+        historiques = historiques.filter(
+            created_at__date__gte=date_debut,
+            created_at__date__lte=date.today()
+        )
+        return historiques
