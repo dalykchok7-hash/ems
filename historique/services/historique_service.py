@@ -98,25 +98,14 @@ class HistoriqueService:
         )
 
     @staticmethod
-    def liste(date_param=None):
-        from datetime import date
+    def liste_par_date(date_param):
+        return Historique.objects.select_related('personnel').filter(
+            created_at__date=date_param
+        )
 
-        historiques = Historique.objects.all().select_related('personnel')
-
-        if date_param:
-            historiques = historiques.filter(
-                created_at__date=date_param
-            )
-
-        return historiques
     @staticmethod
-    
-    def liste_semaine():
-        from datetime import date, timedelta
-
-        date_debut = date.today() - timedelta(days=7)
-
+    def liste_intervalle(date_debut, date_fin):
         return Historique.objects.select_related('personnel').filter(
             created_at__date__gte=date_debut,
-            created_at__date__lte=date.today()
-    )
+            created_at__date__lte=date_fin
+        )
