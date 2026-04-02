@@ -40,8 +40,8 @@ class Abonnement(models.Model):
         'unique':60,
         'pack5' :250,
         'pack10':550,
-        'pack20':920,
-        'pack30':1150,
+        'pack20':960,
+        'pack30':1200,
     }
 
     # ── Clé primaire ─────────────────────────
