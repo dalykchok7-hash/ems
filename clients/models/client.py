@@ -31,12 +31,12 @@ class Client(models.Model):
     telephone_2 = models.CharField(
         max_length=20,
         blank=True,
-        default=''
+        null=True
     )
 
     email = models.EmailField(
         blank=True,
-        default=''
+        null=True
     )
 
     date_naissance = models.DateField(
