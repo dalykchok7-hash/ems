@@ -24,16 +24,53 @@ class ClientService:
         return client
 
     @staticmethod
+    
     def modifier_client(client, data):
+
+    # 🔹 Vérification CIN unique
         nouveau_cin = data.get('cin')
         if nouveau_cin and nouveau_cin != client.cin:
             if Client.objects.filter(cin=nouveau_cin).exists():
                 raise ValueError("Un client avec ce CIN existe déjà")
 
-        for champ in ['nom', 'prenom', 'cin', 'telephone_1',
-                      'telephone_2', 'email', 'date_naissance', 'photo']:
+    # 🔹 Champs modifiables
+        champs = [
+            'nom', 'prenom', 'cin',
+            'telephone_1', 'telephone_2',
+            'email', 'date_naissance', 'photo'
+        ]
+
+        for champ in champs:
             if champ in data:
-                setattr(client, champ, data[champ])
+                value = data[champ]
+
+            # 🔥 IMPORTANT : gérer FormData (QueryDict → liste)
+                if isinstance(value, list):
+                    value = value[0]
+
+            # 🔥 Nettoyage valeur vide
+                if isinstance(value, str):
+                    value = value.strip()
+
+            # 🔥 SUPPRESSION telephone_2
+                if champ == 'telephone_2' and value == '':
+                    value = None  # ou '' selon ton modèle
+
+            # 🔥 Validation téléphone 1 (obligatoire)
+                if champ == 'telephone_1':
+                    if not value or not value.isdigit() or len(value) != 8:
+                       raise ValueError("Téléphone 1 invalide (8 chiffres obligatoires)")
+
+            # 🔥 Validation téléphone 2 (optionnel)
+                if champ == 'telephone_2' and value:
+                   if not value.isdigit() or len(value) != 8:
+                      raise ValueError("Téléphone 2 invalide (8 chiffres)")
+
+            # 🔥 Email vide → null
+                if champ == 'email' and value == '':
+                   value = None
+
+                setattr(client, champ, value)
 
         client.save()
         return client
