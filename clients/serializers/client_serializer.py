@@ -46,9 +46,13 @@ class ClientSerializer(ClientValidationMixin, serializers.ModelSerializer):
 
     def get_abonnement_actif(self, obj):
         abo = obj.abonnement_actif
-        if abo:
-            return abo.get_type_display()  # ← juste "Pack 10"
-        return 'inactif'
+        if not abo:
+            return 'inactif'
+
+        if not abo.pack:
+            return 'sans pack'
+
+        return abo.pack.nom
 
 
 # ── Serializer création ──────────────────────
