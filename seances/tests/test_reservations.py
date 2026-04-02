@@ -55,8 +55,8 @@ class ReservationTestCase(TestCase):
             date               = date.today(),
             heure_debut        = time(9, 0),
             heure_fin          = time(9, 30),
-            places_total       = 5,
-            places_disponibles = 5,
+            places_total       = 3,
+            places_disponibles = 3,
         )
 
         self.url_reservations = f'/api/seances/{self.seance.id}/reservations/'
@@ -277,8 +277,8 @@ class ReservationTestCase(TestCase):
         self.assertEqual(self.seance.places_disponibles, 0)
 
     def test_sixieme_reservation_refuse_creneau_complet(self):
-        # Remplir avec 5 clients
-        for i in range(1, 6):
+        # Remplir avec 3 clients
+        for i in range(1, 4):
             client = Client.objects.create(
                 nom         = f'Client{i}',
                 prenom      = 'Test',

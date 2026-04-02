@@ -55,7 +55,7 @@ class CreerReservationSerializer(serializers.Serializer):
                         choices=['i-motion', 'i-model']
                     )
     taille_gilet  = serializers.ChoiceField(
-                        choices=[ 'S', 'M', 'L'],
+                        choices=[  'M', 'L', 'XL' ],
                         required=False
                     )
 
@@ -98,4 +98,4 @@ class CreerReservationSerializer(serializers.Serializer):
 class CreerReservationSwaggerSerializer(serializers.Serializer):
     abonnement_id = serializers.UUIDField()
     type_appareil = serializers.ChoiceField(choices=['i-motion', 'i-model'])
-    taille_gilet  = serializers.ChoiceField(choices=['S', 'M', 'L'], required=False)
+    taille_gilet  = serializers.ChoiceField(choices=[ 'M', 'L', 'XL' ], required=False)

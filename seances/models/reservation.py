@@ -23,9 +23,10 @@ class Reservation(models.Model):
 
     TAILLE_GILET_CHOICES = [
         
-        ('S',  'S'),
+        
         ('M',  'M'),
         ('L',  'L'),
+        ('XL',  'XL'),
         
     ]
 
@@ -45,7 +46,7 @@ class Reservation(models.Model):
 
     seance = models.ForeignKey(
         Seance,
-        on_delete=models.PROTECT,
+        on_delete=models.CASCADE,
         related_name='reservations'
     )
 

@@ -42,8 +42,8 @@ class SeanceService:
                             date               = jour,
                             heure_debut        = heure_debut,
                             heure_fin          = heure_fin,
-                            places_total       = 5,
-                            places_disponibles = 5,
+                            places_total       = 3,
+                            places_disponibles = 3,
                         )
                     )
 

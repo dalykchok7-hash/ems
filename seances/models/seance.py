@@ -19,9 +19,9 @@ class Seance(models.Model):
     heure_fin   = models.TimeField()
 
     # ── Places ───────────────────────────────
-    places_total = models.IntegerField(default=5)
+    places_total = models.IntegerField(default=3)
 
-    places_disponibles = models.IntegerField(default=5)
+    places_disponibles = models.IntegerField(default=3)
 
     # ── Dates ────────────────────────────────
     created_at = models.DateTimeField(auto_now_add=True)
