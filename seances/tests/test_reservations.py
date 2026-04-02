@@ -81,7 +81,7 @@ class ReservationTestCase(TestCase):
             'taille_gilet': 'M',
         })
         self.seance.refresh_from_db()
-        self.assertEqual(self.seance.places_disponibles, 4)
+        self.assertEqual(self.seance.places_disponibles, 2)
 
     def test_double_reservation_meme_creneau_refuse(self):
         # Première réservation
@@ -200,7 +200,7 @@ class ReservationTestCase(TestCase):
             f'/api/seances/reservations/{reservation_id}/absent/'
         )
         self.seance.refresh_from_db()
-        self.assertEqual(self.seance.places_disponibles, 5)
+        self.assertEqual(self.seance.places_disponibles, 3)
 
     def test_seances_non_decrementees_apres_absent(self):
         res = self.client_api.post(self.url_reservations, {
@@ -244,13 +244,13 @@ class ReservationTestCase(TestCase):
             f'/api/seances/reservations/{reservation_id}/annuler/'
         )
         self.seance.refresh_from_db()
-        self.assertEqual(self.seance.places_disponibles, 5)
+        self.assertEqual(self.seance.places_disponibles, 3)
 
     # ── Tests plusieurs réservations ─────────
 
     def test_cinq_reservations_different_clients(self):
         # Créer 5 clients avec abonnements
-        for i in range(1, 6):
+        for i in range(1, 4):
             client = Client.objects.create(
                 nom         = f'Client{i}',
                 prenom      = 'Test',

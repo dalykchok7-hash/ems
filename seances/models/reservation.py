@@ -46,7 +46,7 @@ class Reservation(models.Model):
 
     seance = models.ForeignKey(
         Seance,
-        on_delete=models.CASCADE,
+        on_delete=models.PROTECT,
         related_name='reservations'
     )
 
