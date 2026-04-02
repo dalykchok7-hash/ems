@@ -8,10 +8,13 @@ from clients.views import (
     AbonnementHistoriqueView,
     AbonnementDetailView,
     AbonnementListView,
+    PackListView,
+    PackDetailView,
 )
 
 urlpatterns = [
-
+     path('packs/',                PackListView.as_view()),
+    path('packs/<uuid:pack_id>/', PackDetailView.as_view()),
     # ✅ IMPORTANT — mettre AVANT <str:cin>
     path('abonnements/',
          AbonnementListView.as_view(),

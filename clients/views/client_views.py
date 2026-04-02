@@ -12,10 +12,10 @@ from clients.services    import ClientService
 from historique.services import HistoriqueService
 from rest_framework.pagination import PageNumberPagination
 from seances.models import Reservation
-from django.db.models import Count
+from django.db.models import Count  
 from datetime import date
 from rest_framework.parsers import MultiPartParser, FormParser, JSONParser
-from django.db.models import Q
+from django.db.models import Q,Count
 
 class ClientListView(APIView):
     permission_classes = [IsAdminOrPersonnel]

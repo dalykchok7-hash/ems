@@ -5,15 +5,6 @@ from .client import Client
 
 class Abonnement(models.Model):
 
-    TYPE_CHOICES = [
-    ('essai',   'Essai'),
-    ('unique', 'Unique'),
-    ('pack5',  'Pack 5'),
-    ('pack10',  'Pack 10'),
-    ('pack20',  'Pack 20'),
-    ('pack30',  'Pack 30'),
-]
-
     MODE_PAIEMENT_CHOICES = [
         ('cash', 'Cash'),
         ('tpe',  'TPE'),
@@ -26,44 +17,28 @@ class Abonnement(models.Model):
         ('terminé',    'Terminé'),
     ]
 
-    SEANCES_PAR_TYPE = {
-        'essai': 1,
-        'unique':1,
-        'pack5' :5,
-        'pack10':10,
-        'pack20':20,
-        'pack30':30,
-    }
-
-    PRIX_PAR_TYPE = {
-        'essai':45,
-        'unique':60,
-        'pack5' :250,
-        'pack10':550,
-        'pack20':960,
-        'pack30':1200,
-    }
-
-    # ── Clé primaire ─────────────────────────
+    # ── Clé primaire ─────────────────────────────────────
     id = models.UUIDField(
         primary_key=True,
         default=uuid.uuid4,
         editable=False
     )
 
-    # ── Relations ────────────────────────────
+    # ── Relations ────────────────────────────────────────
     client = models.ForeignKey(
         Client,
         on_delete=models.CASCADE,
         related_name='abonnements'
     )
 
-    # ── Type et prix ─────────────────────────
-    type = models.CharField(
-        max_length=10,
-        choices=TYPE_CHOICES
+    pack = models.ForeignKey(
+        'Pack',
+        on_delete=models.PROTECT,
+        related_name='abonnements',
+        null=True, blank=True
     )
 
+    # ── Paiement (lié à la transaction, pas au pack) ─────
     prix_paye = models.DecimalField(
         max_digits=8,
         decimal_places=2,
@@ -71,10 +46,10 @@ class Abonnement(models.Model):
     )
 
     reduction = models.DecimalField(
-    max_digits   = 5,
-    decimal_places = 2,
-    default      = 0,
-    help_text    = "Réduction en pourcentage (0-100)"
+        max_digits=5,
+        decimal_places=2,
+        default=0,
+        help_text='Réduction en pourcentage (0-100)'
     )
 
     mode_paiement = models.CharField(
@@ -86,28 +61,16 @@ class Abonnement(models.Model):
 
     est_paye = models.BooleanField(default=False)
 
-    date_paiement = models.DateField(
-        null=True,
-        blank=True
-    )
+    date_paiement = models.DateField(null=True, blank=True)
 
-    # ── Séances ──────────────────────────────
-    seances_total = models.IntegerField(default=0)
-
+    # ── Séances ──────────────────────────────────────────
+    seances_total     = models.IntegerField(default=0)
     seances_restantes = models.IntegerField(default=0)
 
-    # ── Dates ────────────────────────────────
-    date_debut = models.DateField(auto_now_add=True)
-
-    date_derniere_seance = models.DateField(
-        null=True,
-        blank=True
-    )
-
-    date_expiration = models.DateField(
-        null=True,
-        blank=True
-    )
+    # ── Dates ────────────────────────────────────────────
+    date_debut           = models.DateField(auto_now_add=True)
+    date_derniere_seance = models.DateField(null=True, blank=True)
+    date_expiration      = models.DateField(null=True, blank=True)
 
     statut = models.CharField(
         max_length=15,
@@ -123,21 +86,19 @@ class Abonnement(models.Model):
         ordering            = ['-created_at']
 
     def __str__(self):
-        return f"{self.client} — {self.get_type_display()} ({self.statut})"
+        pack_nom = self.pack.nom if self.pack else '—'
+        return f"{self.client} — {pack_nom} ({self.statut})"
 
     def save(self, *args, **kwargs):
-        # Vérifier essai déjà fait
-        if self.type == 'essai' and self.client.essai_fait:
-            raise ValueError("Ce client a déjà bénéficié d'une séance d'essai")
+        if self.pack:
+            # Remplir séances depuis le pack si pas encore défini
+            if not self.seances_total:
+                self.seances_total     = self.pack.nb_seances
+                self.seances_restantes = self.pack.nb_seances
 
-        # Remplir séances automatiquement
-        if not self.seances_total:
-            self.seances_total    = self.SEANCES_PAR_TYPE[self.type]
-            self.seances_restantes = self.seances_total
-
-        # Calculer prix avec réduction
-        prix_normal = self.PRIX_PAR_TYPE[self.type]
-        self.prix_paye = prix_normal - (prix_normal * self.reduction / 100)
+            # Calculer prix_paye = prix_pack - réduction
+            prix_base  = self.pack.prix
+            self.prix_paye = prix_base - (prix_base * self.reduction / 100)
 
         super().save(*args, **kwargs)
 
