@@ -13,5 +13,6 @@ urlpatterns = [
     path('api/historique/', include('historique.urls')),
     # OpenAPI / Swagger
     path('api/schema/', SpectacularAPIView.as_view(), name='schema'),
+    
     path('api/schema/swagger-ui/', SpectacularSwaggerView.as_view(url_name='schema'), name='swagger-ui'),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
