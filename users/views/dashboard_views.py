@@ -264,16 +264,17 @@ class DashboardClientsView(APIView):
     permission_classes = [IsAdminOrPersonnel]
 
     @extend_schema(
-        summary   = 'Dashboard — Stats clients',
-        responses = {200: OpenApiTypes.OBJECT}
+        summary='Dashboard — Stats clients',
+        responses={200: OpenApiTypes.OBJECT}
     )
     def get(self, request):
         aujourd_hui = date.today()
-        debut_mois  = aujourd_hui.replace(day=1)
+        debut_mois = aujourd_hui.replace(day=1)
 
         # ── Totaux clients ────────────────────────
-        total_clients  = Client.objects.count()
-        nouveaux_mois  = Client.objects.filter(
+        total_clients = Client.objects.count()
+
+        nouveaux_mois = Client.objects.filter(
             created_at__date__gte=debut_mois
         ).count()
 
@@ -285,36 +286,29 @@ class DashboardClientsView(APIView):
             abonnements__statut__in=['actif', 'en_attente']
         ).distinct().count()
 
-        # ── Abonnements par type ──────────────────
+        # ── Abonnements par pack (ancien type) ───
         total_abonnements = Abonnement.objects.count()
-        types = Abonnement.objects.values('type').annotate(
+
+        types = Abonnement.objects.values('pack__nom').annotate(
             count=Count('id')
         ).order_by('-count')
 
-        TYPE_LABELS = {
-            'essai'  : 'Essai',
-            'unique' : 'Unique',
-            'pack5'  : 'Pack 5',
-            'pack10' : 'Pack 10',
-            'pack20' : 'Pack 20',
-            'pack30' : 'Pack 30',
-        }
-
         abonnements_par_type = [
             {
-                'type'        : t['type'],
-                'label'       : TYPE_LABELS.get(t['type'], t['type']),
-                'count'       : t['count'],
-                'pourcentage' : round(t['count'] / total_abonnements * 100, 1)
-                                if total_abonnements > 0 else 0,
+                'type': t['pack__nom'],   # ← remplace type
+                'label': t['pack__nom'],  # ← plus besoin de mapping
+                'count': t['count'],
+                'pourcentage': round(
+                    t['count'] / total_abonnements * 100, 1
+                ) if total_abonnements > 0 else 0,
             }
             for t in types
         ]
 
         return Response({
-            'total_clients'       : total_clients,
-            'nouveaux_mois'       : nouveaux_mois,
-            'clients_actifs'      : clients_actifs,
-            'clients_inactifs'    : clients_inactifs,
+            'total_clients': total_clients,
+            'nouveaux_mois': nouveaux_mois,
+            'clients_actifs': clients_actifs,
+            'clients_inactifs': clients_inactifs,
             'abonnements_par_type': abonnements_par_type,
         })
