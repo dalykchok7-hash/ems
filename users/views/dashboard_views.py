@@ -224,7 +224,7 @@ class DashboardAlertesView(APIView):
                 expirations_data.append({
                     'client_nom'        : f"{a.client.prenom} {a.client.nom}",
                     'client_cin'        : a.client.cin,
-                    'type'              : a.get_type_display(),
+                    'type': a.pack.nom if a.pack else 'inconnu',
                     'seances_restantes' : a.seances_restantes,
                 })
             if len(expirations_data) >= 10:
