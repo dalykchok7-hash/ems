@@ -18,27 +18,30 @@ from produits.models    import Vente, Produit
 # GET /api/users/dashboard/revenus/?periode=7j|12m|tout
 # ══════════════════════════════════════════════════════════════════
 
+
+
+
 class DashboardRevenusView(APIView):
     permission_classes = [IsAdminOrPersonnel]
 
     @extend_schema(
-        summary    = 'Dashboard — Revenus',
-        parameters = [
+        summary='Dashboard — Revenus',
+        parameters=[
             OpenApiParameter(
-                name        = 'periode',
-                type        = str,
-                location    = OpenApiParameter.QUERY,
-                description = 'Période courbe : 7j, 12m, tout',
-                required    = False,
+                name='periode',
+                type=str,
+                location=OpenApiParameter.QUERY,
+                description='Période courbe : 7j, 12m, tout',
+                required=False,
             )
         ],
-        responses  = {200: OpenApiTypes.OBJECT}
+        responses={200: OpenApiTypes.OBJECT}
     )
     def get(self, request):
         aujourd_hui = date.today()
-        debut_mois  = aujourd_hui.replace(day=1)
+        debut_mois = aujourd_hui.replace(day=1)
         debut_annee = aujourd_hui.replace(month=1, day=1)
-        periode     = request.query_params.get('periode', '12m')
+        periode = request.query_params.get('periode', '12m')
 
         MOIS_FR = {
             1: 'Jan', 2: 'Fév', 3: 'Mar', 4: 'Avr',
@@ -46,8 +49,8 @@ class DashboardRevenusView(APIView):
             9: 'Sep', 10: 'Oct', 11: 'Nov', 12: 'Déc'
         }
 
-        # ── Revenus jour ─────────────────────────
-        abo_jour   = Abonnement.objects.filter(
+        # ── Revenus jour
+        abo_jour = Abonnement.objects.filter(
             est_paye=True, created_at__date=aujourd_hui
         ).aggregate(t=Sum('prix_paye'))['t'] or 0
 
@@ -55,8 +58,8 @@ class DashboardRevenusView(APIView):
             created_at__date=aujourd_hui
         ).aggregate(t=Sum('prix_total'))['t'] or 0
 
-        # ── Revenus mois ─────────────────────────
-        abo_mois   = Abonnement.objects.filter(
+        # ── Revenus mois
+        abo_mois = Abonnement.objects.filter(
             est_paye=True, created_at__date__gte=debut_mois
         ).aggregate(t=Sum('prix_paye'))['t'] or 0
 
@@ -64,8 +67,8 @@ class DashboardRevenusView(APIView):
             created_at__date__gte=debut_mois
         ).aggregate(t=Sum('prix_total'))['t'] or 0
 
-        # ── Revenus année ─────────────────────────
-        abo_annee   = Abonnement.objects.filter(
+        # ── Revenus année
+        abo_annee = Abonnement.objects.filter(
             est_paye=True, created_at__date__gte=debut_annee
         ).aggregate(t=Sum('prix_paye'))['t'] or 0
 
@@ -73,127 +76,123 @@ class DashboardRevenusView(APIView):
             created_at__date__gte=debut_annee
         ).aggregate(t=Sum('prix_total'))['t'] or 0
 
-        # ── Courbe revenus ────────────────────────
+        # ── Courbe revenus
         revenus_courbe = []
 
         if periode == '7j':
             for i in range(6, -1, -1):
                 jour = aujourd_hui - timedelta(days=i)
-                abo  = Abonnement.objects.filter(
+
+                abo = Abonnement.objects.filter(
                     est_paye=True, created_at__date=jour
                 ).aggregate(t=Sum('prix_paye'))['t'] or 0
-                ven  = Vente.objects.filter(
+
+                ven = Vente.objects.filter(
                     created_at__date=jour
                 ).aggregate(t=Sum('prix_total'))['t'] or 0
+
                 revenus_courbe.append({
-                    'label'            : str(jour),
-                    'abonnements'      : float(abo),
-                    'ventes'           : float(ven),
-                    'total'            : float(abo) + float(ven),
+                    'label': str(jour),
+                    'abonnements': float(abo),
+                    'ventes': float(ven),
+                    'total': float(abo) + float(ven),
                 })
 
         elif periode == '12m':
             annee = aujourd_hui.year
+
             for mois in range(1, 13):
                 abo = Abonnement.objects.filter(
                     est_paye=True,
                     created_at__year=annee,
                     created_at__month=mois,
                 ).aggregate(t=Sum('prix_paye'))['t'] or 0
+
                 ven = Vente.objects.filter(
                     created_at__year=annee,
                     created_at__month=mois,
                 ).aggregate(t=Sum('prix_total'))['t'] or 0
+
                 revenus_courbe.append({
-                    'label'       : f"{MOIS_FR[mois]} {annee}",
-                    'abonnements' : float(abo),
-                    'ventes'      : float(ven),
-                    'total'       : float(abo) + float(ven),
+                    'label': f"{MOIS_FR[mois]} {annee}",
+                    'abonnements': float(abo),
+                    'ventes': float(ven),
+                    'total': float(abo) + float(ven),
                 })
 
-        else:  # tout → depuis 2026
+        else:  # tout
             annee_actuelle = aujourd_hui.year
+
             for annee in range(2026, annee_actuelle + 1):
                 abo = Abonnement.objects.filter(
                     est_paye=True, created_at__year=annee
                 ).aggregate(t=Sum('prix_paye'))['t'] or 0
+
                 ven = Vente.objects.filter(
                     created_at__year=annee
                 ).aggregate(t=Sum('prix_total'))['t'] or 0
+
                 revenus_courbe.append({
-                    'label'       : str(annee),
-                    'abonnements' : float(abo),
-                    'ventes'      : float(ven),
-                    'total'       : float(abo) + float(ven),
+                    'label': str(annee),
+                    'abonnements': float(abo),
+                    'ventes': float(ven),
+                    'total': float(abo) + float(ven),
                 })
 
-        # ── Meilleur mois + moyenne ───────────────
+        # ── Stats globales
         if revenus_courbe:
             meilleur = max(revenus_courbe, key=lambda x: x['total'])
-            moyenne  = round(
+            moyenne = round(
                 sum(r['total'] for r in revenus_courbe) / len(revenus_courbe), 2
             )
         else:
             meilleur = {'label': '-', 'total': 0}
-            moyenne  = 0
+            moyenne = 0
 
-        # ── Revenue par type abonnement ───────────
+        # ── Revenus par pack (REMPLACE type)
         total_abonnements = Abonnement.objects.filter(est_paye=True).count()
+
         types = Abonnement.objects.filter(
             est_paye=True
-        ).values('type').annotate(
-            count     = Count('id'),
-            montant   = Sum('prix_paye')
+        ).values('pack__nom').annotate(
+            count=Count('id'),
+            montant=Sum('prix_paye')
         ).order_by('-montant')
-
-        TYPE_LABELS = {
-            'essai'  : 'Essai',
-            'unique' : 'Unique',
-            'pack5'  : 'Pack 5',
-            'pack10' : 'Pack 10',
-            'pack20' : 'Pack 20',
-            'pack30' : 'Pack 30',
-        }
 
         revenus_par_type = [
             {
-                'type'        : t['type'],
-                'label'       : TYPE_LABELS.get(t['type'], t['type']),
-                'count'       : t['count'],
-                'montant'     : float(t['montant'] or 0),
-                'pourcentage' : round(t['count'] / total_abonnements * 100, 1)
-                                if total_abonnements > 0 else 0,
+                'type': t['pack__nom'],  # ← important
+                'label': t['pack__nom'],
+                'count': t['count'],
+                'montant': float(t['montant'] or 0),
+                'pourcentage': round(
+                    t['count'] / total_abonnements * 100, 1
+                ) if total_abonnements > 0 else 0,
             }
             for t in types
         ]
 
         return Response({
-            # Revenus jour
             'revenu_jour': {
                 'abonnements': float(abo_jour),
-                'ventes'     : float(vente_jour),
-                'total'      : float(abo_jour) + float(vente_jour),
+                'ventes': float(vente_jour),
+                'total': float(abo_jour) + float(vente_jour),
             },
-            # Revenus mois
             'revenu_mois': {
                 'abonnements': float(abo_mois),
-                'ventes'     : float(vente_mois),
-                'total'      : float(abo_mois) + float(vente_mois),
+                'ventes': float(vente_mois),
+                'total': float(abo_mois) + float(vente_mois),
             },
-            # Revenus année
             'revenu_annee': {
                 'abonnements': float(abo_annee),
-                'ventes'     : float(vente_annee),
-                'total'      : float(abo_annee) + float(vente_annee),
+                'ventes': float(vente_annee),
+                'total': float(abo_annee) + float(vente_annee),
             },
-            # Courbe
-            'revenus_courbe'  : revenus_courbe,
-            'meilleur_mois'   : meilleur,
+            'revenus_courbe': revenus_courbe,
+            'meilleur_mois': meilleur,
             'moyenne_mensuelle': moyenne,
-            # Par type
             'revenus_par_type': revenus_par_type,
         })
-
 
 # ══════════════════════════════════════════════════════════════════
 # BLOC 2 — ALERTES
