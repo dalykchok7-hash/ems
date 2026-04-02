@@ -61,3 +61,6 @@ class ModifierPersonnelSerializer(serializers.Serializer):
     date_embauche = serializers.DateField(required=False)
 class LogoutSerializer(serializers.Serializer):
     refresh = serializers.CharField()
+class ChangePasswordSerializer(serializers.Serializer):
+    old_password = serializers.CharField()
+    new_password = serializers.CharField(min_length=6)

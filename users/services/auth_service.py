@@ -29,6 +29,16 @@ class AuthService:
             },
             'instance': user
         }
+    @staticmethod
+    def change_password(user, old_password, new_password):
+
+        if not user.check_password(old_password):
+            raise ValueError("Ancien mot de passe incorrect")
+
+        user.set_password(new_password)
+        user.save()
+
+        return True
 
     @staticmethod
     def creer_personnel(data):

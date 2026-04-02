@@ -5,14 +5,17 @@ from datetime                import date, timedelta
 from django.db.models        import Sum, Count
 from django.db.models.functions import TruncMonth
 
-from drf_spectacular.utils import extend_schema, OpenApiParameter
+from drf_spectacular.utils import extend_schema, OpenApiParameter, OpenApiExample
 from drf_spectacular.types import OpenApiTypes
 
 from users.permissions  import IsAdminOrPersonnel
 from clients.models     import Abonnement, Client
 from produits.models    import Vente, Produit
-
-
+from rest_framework.permissions import IsAuthenticated
+from users.serializers import ChangePasswordSerializer
+from users.services import AuthService
+from django.contrib.auth.tokens import PasswordResetTokenGenerator
+from users.models import Utilisateur
 # ══════════════════════════════════════════════════════════════════
 # BLOC 1 — REVENUS
 # GET /api/users/dashboard/revenus/?periode=7j|12m|tout
@@ -312,3 +315,64 @@ class DashboardClientsView(APIView):
             'clients_inactifs': clients_inactifs,
             'abonnements_par_type': abonnements_par_type,
         })
+class ChangePasswordView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    @extend_schema(
+        summary="Changer le mot de passe",
+        description="Permet à un utilisateur connecté de modifier son mot de passe",
+        request=ChangePasswordSerializer,
+        responses={
+            200: OpenApiTypes.OBJECT,
+            400: OpenApiTypes.OBJECT,
+        },
+        examples=[
+            OpenApiExample(
+                "Exemple requête",
+                value={
+                    "old_password": "123456",
+                    "new_password": "newpassword123"
+                },
+                request_only=True
+            ),
+            OpenApiExample(
+                "Succès",
+                value={"message": "Mot de passe modifié avec succès"},
+                response_only=True
+            ),
+        ]
+    )
+    def post(self, request):
+        serializer = ChangePasswordSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+
+        try:
+            AuthService.change_password(
+                user=request.user,
+                old_password=serializer.validated_data['old_password'],
+                new_password=serializer.validated_data['new_password']
+            )
+
+            return Response({"message": "Mot de passe modifié avec succès"})
+
+        except ValueError as e:
+            return Response({"error": str(e)}, status=400)
+class ResetPasswordView(APIView):
+
+    def post(self, request):
+        user_id = request.data.get("user_id")
+        token = request.data.get("token")
+        new_password = request.data.get("new_password")
+
+        try:
+            user = Utilisateur.objects.get(id=user_id)
+        except Utilisateur.DoesNotExist:
+            return Response({"error": "Utilisateur introuvable"}, status=404)
+
+        if not PasswordResetTokenGenerator().check_token(user, token):
+            return Response({"error": "Token invalide"}, status=400)
+
+        user.set_password(new_password)
+        user.save()
+
+        return Response({"message": "Mot de passe réinitialisé"})
