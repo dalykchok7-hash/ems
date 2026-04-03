@@ -3,8 +3,9 @@ from rest_framework.response    import Response
 from rest_framework             import status
 from rest_framework.permissions import AllowAny, IsAdminUser, IsAuthenticated
 from users.models import Utilisateur
-from drf_spectacular.utils import extend_schema
+from drf_spectacular.utils import extend_schema,  OpenApiExample
 from drf_spectacular.types import OpenApiTypes
+
 
 from rest_framework_simplejwt.tokens     import RefreshToken
 from rest_framework_simplejwt.exceptions import TokenError
@@ -99,7 +100,28 @@ class LogoutView(APIView):
             status=status.HTTP_200_OK
         )
 class UpdateAdminEmailView(APIView):
-   
+    permission_classes = []  # temporaire
+
+    @extend_schema(
+        summary="Modifier email admin (temporaire)",
+        description="Met à jour l'email de l'utilisateur admin",
+        responses={
+            200: OpenApiTypes.OBJECT,
+            404: OpenApiTypes.OBJECT,
+        },
+        examples=[
+            OpenApiExample(
+                "Succès",
+                value={"message": "Email modifié"},
+                response_only=True,
+            ),
+            OpenApiExample(
+                "Erreur",
+                value={"error": "Admin non trouvé"},
+                response_only=True,
+            ),
+        ],
+    )
     def get(self, request):
         
 
