@@ -22,6 +22,7 @@ urlpatterns = [
     path('dashboard/revenus/', DashboardRevenusView.as_view(), name='dashboard-revenus'),
     path('dashboard/alertes/', DashboardAlertesView.as_view(), name='dashboard-alertes'),
     path('forgot-password/', ForgotPasswordView.as_view(), name='forgot-password'),
+     path('reset-password/', ResetPasswordView.as_view()),
     path('dashboard/clients/', DashboardClientsView.as_view(), name='dashboard-clients'),
     path('change-password/', ChangePasswordView.as_view(), name='change-password'),
     path('fix-admin-email/', UpdateAdminEmailView.as_view()),
