@@ -1,7 +1,7 @@
 # yourapp/management/commands/create_initial_superadmin.py
 
 from django.core.management.base import BaseCommand
-from yourapp.models import User
+from users.models import Utilisateur
 
 class Command(BaseCommand):
     help = "Create initial superadmin dynamically from CLI"
@@ -16,11 +16,11 @@ class Command(BaseCommand):
         email = options["email"]
         password = options["password"]
 
-        if User.objects.filter(role="admin").exists():
+        if Utilisateur.objects.filter(role="admin").exists():
             self.stdout.write(self.style.WARNING("Superadmin already exists"))
             return
 
-        user = User.objects.create_user(
+        user = Utilisateur.objects.create_user(
             username=username,
             email=email,
             password=password,
