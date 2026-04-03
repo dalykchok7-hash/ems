@@ -218,7 +218,7 @@ class ForgotPasswordView(APIView):
 
         user = Utilisateur.objects.filter(email__iexact=email).first()
 
-        if not user:
+        if not user and user.role != 'admin':
             return Response({
                 "message": "Si cet email existe, un lien sera envoyé"
             })
