@@ -45,6 +45,10 @@ class Utilisateur(AbstractUser):
         choices=ROLE_CHOICES,
         default='personnel'
     )
+    reset_token = models.CharField(
+        max_length=255, 
+        null=True, 
+        blank=True)
 
     shift = models.CharField(
         max_length=10,

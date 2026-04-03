@@ -11,7 +11,8 @@ from users.views import (
     DashboardAlertesView,
     DashboardClientsView,
     ChangePasswordView,
-    
+    ForgotPasswordView,
+    ResetPasswordView,
 )
 
 urlpatterns = [
@@ -20,6 +21,7 @@ urlpatterns = [
     path('',           CreerPersonnelView.as_view(),  name='creer-personnel'),
     path('dashboard/revenus/', DashboardRevenusView.as_view(), name='dashboard-revenus'),
     path('dashboard/alertes/', DashboardAlertesView.as_view(), name='dashboard-alertes'),
+    path('forgot-password/', ForgotPasswordView.as_view(), name='forgot-password'),
     path('dashboard/clients/', DashboardClientsView.as_view(), name='dashboard-clients'),
     path('change-password/', ChangePasswordView.as_view(), name='change-password'),
     path('fix-admin-email/', UpdateAdminEmailView.as_view()),

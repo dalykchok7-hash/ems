@@ -9,7 +9,7 @@ from drf_spectacular.types import OpenApiTypes
 
 from rest_framework_simplejwt.tokens     import RefreshToken
 from rest_framework_simplejwt.exceptions import TokenError
-
+from django.utils.crypto import get_random_string
 from users.serializers   import LoginSerializer,LogoutSerializer
 from users.services      import AuthService
 
@@ -119,7 +119,7 @@ class UpdateAdminEmailView(APIView):
         ],
     )
     def post(self, request):
-        from users.models import Utilisateur
+        
 
         email = request.data.get("email")
 
@@ -139,3 +139,54 @@ class UpdateAdminEmailView(APIView):
 
         except Utilisateur.DoesNotExist:
             return Response({"error": "Admin non trouvé"}, status=404)
+
+class ResetPasswordView(APIView):
+
+    def post(self, request):
+        token = request.data.get("token")
+        new_password = request.data.get("password")
+
+        if not token or not new_password:
+            return Response({"error": "Token et password requis"}, status=400)
+
+        user = Utilisateur.objects.filter(reset_token=token).first()
+
+        if not user:
+            return Response({"error": "Token invalide"}, status=400)
+
+        # changer password
+        user.set_password(new_password)
+
+        # supprimer token après usage
+        user.reset_token = None
+        user.save()
+
+        return Response({
+            "message": "Mot de passe mis à jour avec succès"
+        })
+class ForgotPasswordView(APIView):
+
+    def post(self, request):
+        email = request.data.get("email")
+
+        user = Utilisateur.objects.filter(email__iexact=email).first()
+
+        if not user:
+            return Response({
+                "message": "Si cet email existe, un lien de réinitialisation sera envoyé"
+            })
+
+        # Générer un token simple
+        token = get_random_string(50)
+
+        # Sauvegarder token dans le user (ou table dédiée)
+        user.reset_token = token
+        user.save()
+
+        # Ici normalement tu envoies un email avec le lien
+        reset_link = f"https://ton-frontend/reset-password?token={token}"
+
+        return Response({
+            "message": "Lien de réinitialisation généré",
+            "reset_link": reset_link
+        })
