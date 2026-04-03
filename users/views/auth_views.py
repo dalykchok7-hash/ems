@@ -141,7 +141,7 @@ class UpdateAdminEmailView(APIView):
             return Response({"error": "Admin non trouvé"}, status=404)
 
 class ResetPasswordView(APIView):
-
+    permission_classes = [AllowAny] 
     def post(self, request):
         token = request.data.get("token")
         new_password = request.data.get("password")
@@ -165,7 +165,7 @@ class ResetPasswordView(APIView):
             "message": "Mot de passe mis à jour avec succès"
         })
 class ForgotPasswordView(APIView):
-
+    permission_classes = [AllowAny]  # ✅ IMPORTANT
     def post(self, request):
         email = request.data.get("email")
 
