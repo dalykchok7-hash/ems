@@ -127,7 +127,7 @@ class UpdateAdminEmailView(APIView):
             return Response({"error": "Email requis"}, status=400)
 
         try:
-            admin = Utilisateur.objects.get(role="admin").first()
+            admin = Utilisateur.objects.get(id=request.user.id).first()
 
             admin.email = email
             admin.save()
