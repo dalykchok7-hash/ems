@@ -99,7 +99,7 @@ class LogoutView(APIView):
             status=status.HTTP_200_OK
         )
 class UpdateAdminEmailView(APIView):
-    permission_classes = [IsAdminUser]
+   
     def get(self, request):
         
 
