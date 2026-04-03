@@ -101,32 +101,41 @@ class LogoutView(APIView):
         )
 class UpdateAdminEmailView(APIView):
     permission_classes = []  # temporaire
-
     @extend_schema(
-        summary="Modifier email admin (temporaire)",
-        description="Met à jour l'email de l'utilisateur admin",
-        responses={
-            200: OpenApiTypes.OBJECT,
-            404: OpenApiTypes.OBJECT,
-        },
+        summary="Modifier email admin",
+        request=OpenApiTypes.OBJECT,
+        responses={200: OpenApiTypes.OBJECT},
         examples=[
+            OpenApiExample(
+                "Requête",
+                value={"email": "chihajihed3@gmail.com"},
+                request_only=True,
+            ),
             OpenApiExample(
                 "Succès",
                 value={"message": "Email modifié"},
                 response_only=True,
             ),
-            OpenApiExample(
-                "Erreur",
-                value={"error": "Admin non trouvé"},
-                response_only=True,
-            ),
         ],
     )
-    def get(self, request):
-        
+    def post(self, request):
+        from users.models import Utilisateur
 
-        admin = Utilisateur.objects.get(username="admin")
-        admin.email = "chihajihed3@gmail.com"
-        admin.save()
+        email = request.data.get("email")
 
-        return Response({"message": "Email modifié"})
+        if not email:
+            return Response({"error": "Email requis"}, status=400)
+
+        try:
+            admin = Utilisateur.objects.get(role="admin")
+
+            admin.email = email
+            admin.save()
+
+            return Response({
+                "message": "Email modifié",
+                "email": admin.email
+            })
+
+        except Utilisateur.DoesNotExist:
+            return Response({"error": "Admin non trouvé"}, status=404)
