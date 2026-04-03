@@ -5,7 +5,8 @@ from rest_framework.permissions import AllowAny, IsAdminUser, IsAuthenticated
 from users.models import Utilisateur
 from drf_spectacular.utils import extend_schema,  OpenApiExample
 from drf_spectacular.types import OpenApiTypes
-
+from django.core.mail import send_mail
+from django.conf import settings
 
 from rest_framework_simplejwt.tokens     import RefreshToken
 from rest_framework_simplejwt.exceptions import TokenError
@@ -165,7 +166,8 @@ class ResetPasswordView(APIView):
             "message": "Mot de passe mis à jour avec succès"
         })
 class ForgotPasswordView(APIView):
-    permission_classes = [AllowAny]  # ✅ IMPORTANT
+    permission_classes = [AllowAny]
+
     def post(self, request):
         email = request.data.get("email")
 
@@ -173,20 +175,24 @@ class ForgotPasswordView(APIView):
 
         if not user:
             return Response({
-                "message": "Si cet email existe, un lien de réinitialisation sera envoyé"
+                "message": "Si cet email existe, un lien sera envoyé"
             })
 
-        # Générer un token simple
         token = get_random_string(50)
-
-        # Sauvegarder token dans le user (ou table dédiée)
         user.reset_token = token
         user.save()
 
-        # Ici normalement tu envoies un email avec le lien
         reset_link = f"https://ton-frontend/reset-password?token={token}"
 
+        # ✅ ENVOI EMAIL
+        send_mail(
+            subject="Réinitialisation de mot de passe",
+            message=f"Cliquez sur ce lien pour réinitialiser votre mot de passe : {reset_link}",
+            from_email=settings.DEFAULT_FROM_EMAIL,
+            recipient_list=[user.email],
+            fail_silently=False,
+        )
+
         return Response({
-            "message": "Lien de réinitialisation généré",
-            "reset_link": reset_link
+            "message": "Email envoyé avec succès"
         })
