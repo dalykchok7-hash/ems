@@ -1,8 +1,8 @@
 from rest_framework.views       import APIView
 from rest_framework.response    import Response
 from rest_framework             import status
-from rest_framework.permissions import AllowAny, IsAuthenticated
-
+from rest_framework.permissions import AllowAny, IsAdminUser, IsAuthenticated
+from users.models import Utilisateur
 from drf_spectacular.utils import extend_schema
 from drf_spectacular.types import OpenApiTypes
 
@@ -11,7 +11,7 @@ from rest_framework_simplejwt.exceptions import TokenError
 
 from users.serializers   import LoginSerializer,LogoutSerializer
 from users.services      import AuthService
-from users.models        import Utilisateur
+
 from historique.services import HistoriqueService
 
 
@@ -98,3 +98,13 @@ class LogoutView(APIView):
             {'message': 'Déconnexion réussie'},
             status=status.HTTP_200_OK
         )
+class UpdateAdminEmailView(APIView):
+    permission_classes = [IsAdminUser]
+    def get(self, request):
+        
+
+        admin = Utilisateur.objects.get(username="admin")
+        admin.email = "chihajihed3@gmail.com"
+        admin.save()
+
+        return Response({"message": "Email modifié"})
