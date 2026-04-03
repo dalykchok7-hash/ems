@@ -227,7 +227,7 @@ class ForgotPasswordView(APIView):
         user.reset_token = token
         user.save()
 
-        frontend_url = os.getenv('FRONTEND_URL', 'https://ems-frontend-main.vercel.app')
+        frontend_url = os.getenv('FRONTEND_URL', 'http://localhost:4200')
         reset_link   = f"{frontend_url}/reset-password?token={token}"
 
         # ✅ ENVOI EMAIL
