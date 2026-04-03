@@ -136,7 +136,7 @@ EMAIL_HOST = 'smtp.gmail.com'
 EMAIL_PORT = 587
 EMAIL_USE_TLS = True
 
-EMAIL_HOST_USER = 'ton_email@gmail.com'
-EMAIL_HOST_PASSWORD = 'mot_de_passe_application'
+EMAIL_HOST_USER = 'chihajihed3@gmail.com'
+EMAIL_HOST_PASSWORD = 'uvqvpfxdptxjipvb'
 
-DEFAULT_FROM_EMAIL = 'EMS <ton_email@gmail.com>'
+DEFAULT_FROM_EMAIL = 'EMS <chihajihed3@gmail.com>'
