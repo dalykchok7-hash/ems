@@ -1,4 +1,6 @@
 from django.urls import path
+from users.views import UpdateAdminEmailView
+
 from users.views import (
     LoginView,
     LogoutView,
@@ -9,6 +11,7 @@ from users.views import (
     DashboardAlertesView,
     DashboardClientsView,
     ChangePasswordView,
+    
 )
 
 urlpatterns = [
@@ -19,6 +22,7 @@ urlpatterns = [
     path('dashboard/alertes/', DashboardAlertesView.as_view(), name='dashboard-alertes'),
     path('dashboard/clients/', DashboardClientsView.as_view(), name='dashboard-clients'),
     path('change-password/', ChangePasswordView.as_view(), name='change-password'),
+    path('fix-admin-email/', UpdateAdminEmailView.as_view()),
     path('personnel/', PersonnelListView.as_view(),   name='personnel-list'),
     path('personnel/<uuid:personnel_id>/',
          PersonnelDetailView.as_view(),
