@@ -2,7 +2,7 @@ from django.test import TestCase
 from rest_framework.test import APIClient
 from rest_framework import status
 from users.models import Utilisateur
-from clients.models import Client, Abonnement
+from clients.models import Client, Abonnement, Pack
 from seances.models import Seance
 from datetime import date, time
 
@@ -40,9 +40,10 @@ class ReservationTestCase(TestCase):
         )
 
         # Créer abonnement pack10
+        self.pack_test = Pack.objects.create(nom='Pack 10', nb_seances=10, prix=350, est_actif=True)
         self.abonnement = Abonnement.objects.create(
             client            = self.client_test,
-            type              = 'pack10',
+            pack              = self.pack_test,
             statut            = 'actif',
             seances_restantes = 10,
             prix_paye         = 350,
@@ -259,7 +260,7 @@ class ReservationTestCase(TestCase):
             )
             abo = Abonnement.objects.create(
                 client            = client,
-                type              = 'pack10',
+                pack              = self.pack_test,
                 statut            = 'actif',
                 seances_restantes = 10,
                 prix_paye         = 350,
@@ -287,7 +288,7 @@ class ReservationTestCase(TestCase):
             )
             abo = Abonnement.objects.create(
                 client            = client,
-                type              = 'pack10',
+                pack              = self.pack_test,
                 statut            = 'actif',
                 seances_restantes = 10,
                 prix_paye         = 350,
