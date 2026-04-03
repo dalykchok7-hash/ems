@@ -12,7 +12,8 @@ from django.conf import settings
 from rest_framework_simplejwt.tokens     import RefreshToken
 from rest_framework_simplejwt.exceptions import TokenError
 from django.utils.crypto import get_random_string
-from users.serializers   import LoginSerializer,LogoutSerializer
+from users.serializers   import LoginSerializer, LogoutSerializer, ChangePasswordSerializer
+from users.permissions   import IsAdmin
 from users.services      import AuthService
 
 from historique.services import HistoriqueService
@@ -102,7 +103,7 @@ class LogoutView(APIView):
             status=status.HTTP_200_OK
         )
 class UpdateAdminEmailView(APIView):
-    permission_classes = []  # temporaire
+    permission_classes = [IsAdmin]
     @extend_schema(
         summary="Modifier email admin",
         request=OpenApiTypes.OBJECT,
@@ -141,6 +142,49 @@ class UpdateAdminEmailView(APIView):
 
         except Utilisateur.DoesNotExist:
             return Response({"error": "Admin non trouvé"}, status=404)
+
+class ChangePasswordView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    @extend_schema(
+        summary="Changer le mot de passe",
+        description="Permet à un utilisateur connecté de modifier son mot de passe",
+        request=ChangePasswordSerializer,
+        responses={
+            200: OpenApiTypes.OBJECT,
+            400: OpenApiTypes.OBJECT,
+        },
+        examples=[
+            OpenApiExample(
+                "Exemple requête",
+                value={
+                    "old_password": "123456",
+                    "new_password": "newpassword123"
+                },
+                request_only=True
+            ),
+            OpenApiExample(
+                "Succès",
+                value={"message": "Mot de passe modifié avec succès"},
+                response_only=True
+            ),
+        ]
+    )
+    def post(self, request):
+        serializer = ChangePasswordSerializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+
+        try:
+            AuthService.change_password(
+                user=request.user,
+                old_password=serializer.validated_data['old_password'],
+                new_password=serializer.validated_data['new_password']
+            )
+
+            return Response({"message": "Mot de passe modifié avec succès"})
+
+        except ValueError as e:
+            return Response({"error": str(e)}, status=400)
 
 class ResetPasswordView(APIView):
     permission_classes = [AllowAny]

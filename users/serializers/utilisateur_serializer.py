@@ -56,7 +56,6 @@ class ModifierPersonnelSerializer(serializers.Serializer):
     email         = serializers.EmailField(required=False)        # ← ajouter
     cin           = serializers.CharField(max_length=8, required=False)   # ← ajouter
     telephone     = serializers.CharField(max_length=20, required=False)
-    role          = serializers.ChoiceField(choices=['admin', 'personnel'], required=False)  # ← ajouter
     shift         = serializers.ChoiceField(choices=['jour', 'soir'], required=False)
     date_embauche = serializers.DateField(required=False)
 class LogoutSerializer(serializers.Serializer):

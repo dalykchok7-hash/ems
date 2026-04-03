@@ -117,7 +117,7 @@ class PersonnelDetailView(APIView):
             )
         champs_modifiables = [
             'first_name', 'last_name', 'email',
-            'cin', 'telephone', 'role', 'shift', 'date_embauche'
+            'cin', 'telephone', 'shift', 'date_embauche'
         ]
 
         for champ, valeur in serializer.validated_data.items():
