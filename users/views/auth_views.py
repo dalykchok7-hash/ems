@@ -1,3 +1,4 @@
+import os
 from rest_framework.views       import APIView
 from rest_framework.response    import Response
 from rest_framework             import status
@@ -142,23 +143,23 @@ class UpdateAdminEmailView(APIView):
             return Response({"error": "Admin non trouvé"}, status=404)
 
 class ResetPasswordView(APIView):
-    permission_classes = [AllowAny] 
+    permission_classes = [AllowAny]
     def post(self, request):
-        token = request.data.get("token")
-        new_password = request.data.get("password")
+        token        = request.data.get("token")
+        new_password = request.data.get("new_password")  # ✅ correspond au frontend
 
         if not token or not new_password:
-            return Response({"error": "Token et password requis"}, status=400)
+            return Response({"error": "Token et nouveau mot de passe requis"}, status=400)
 
         user = Utilisateur.objects.filter(reset_token=token).first()
 
         if not user:
-            return Response({"error": "Token invalide"}, status=400)
+            return Response({"error": "Token invalide ou expiré"}, status=400)
 
-        # changer password
+        # Changer le mot de passe
         user.set_password(new_password)
 
-        # supprimer token après usage
+        # Invalider le token après usage
         user.reset_token = None
         user.save()
 
@@ -182,7 +183,8 @@ class ForgotPasswordView(APIView):
         user.reset_token = token
         user.save()
 
-        reset_link = f"https://ton-frontend/reset-password?token={token}"
+        frontend_url = os.getenv('FRONTEND_URL', 'https://ems-frontend-main.vercel.app')
+        reset_link   = f"{frontend_url}/reset-password?token={token}"
 
         # ✅ ENVOI EMAIL
         send_mail(
