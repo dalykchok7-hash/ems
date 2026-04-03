@@ -220,8 +220,8 @@ class ForgotPasswordView(APIView):
         print(user)
         if not user or user.role != 'admin':
             return Response({
-                "message": "Si cet email existe, un lien sera envoyé"
-            })
+                "message": "Cette fonctionalité n'est pas disponible pour votre compte."
+            }, status=status.HTTP_400_BAD_REQUEST)
 
         token = get_random_string(50)
         user.reset_token = token
