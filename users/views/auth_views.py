@@ -231,17 +231,24 @@ class ForgotPasswordView(APIView):
         reset_link   = f"{frontend_url}/reset-password?token={token}"
 
         # ✅ ENVOI EMAIL
-        # try:
-        #     send_mail(
-        #         subject="Réinitialisation de mot de passe",
-        #         message=f"Cliquez sur ce lien pour réinitialiser votre mot de passe : {reset_link}",
-        #         from_email=settings.DEFAULT_FROM_EMAIL,
-        #         recipient_list=[user.email],
-        #         fail_silently=False,
-        #     )
+        try:
+            send_mail(
+                subject="Réinitialisation de mot de passe",
+                message=f"Cliquez sur ce lien pour réinitialiser votre mot de passe : {reset_link}",
+                from_email=settings.DEFAULT_FROM_EMAIL,
+                recipient_list=[user.email],
+                fail_silently=False,
+            )
+            print("EMAIL SENT SUCCESS")
 
-        # except Exception as e:
-        #     print("Erreur lors de l'envoi de l'email :", str(e))
+        except Exception as e:
+            import traceback
+            traceback.print_exc()
+            print("Erreur lors de l'envoi de l'email :", str(e))
+            return Response({
+                "error": "Échec de l'envoi de l'email",
+                "details": str(e)
+            }, status=500)
 
         return Response({
             "message": "Email envoyé avec succès"
