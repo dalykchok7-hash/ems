@@ -276,3 +276,21 @@ class ForgotPasswordView(APIView):
         return Response({
             "message": "Email envoyé avec succès"
         })
+
+class ProfileView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    @extend_schema(
+        summary="Récupérer le profil",
+        description="Retourne les informations de l'utilisateur connecté",
+        responses={200: OpenApiTypes.OBJECT}
+    )
+    def get(self, request):
+        user = request.user
+        return Response({
+            "id": str(user.id),
+            "username": user.username,
+            "email": user.email,
+            "nom": user.get_full_name(),
+            "role": user.role
+        })

@@ -13,6 +13,7 @@ from users.views import (
     ChangePasswordView,
     ForgotPasswordView,
     ResetPasswordView,
+    ProfileView,
 )
 
 urlpatterns = [
@@ -25,7 +26,8 @@ urlpatterns = [
      path('reset-password/', ResetPasswordView.as_view()),
     path('dashboard/clients/', DashboardClientsView.as_view(), name='dashboard-clients'),
     path('change-password/', ChangePasswordView.as_view(), name='change-password'),
-    path('fix-admin-email/', UpdateAdminEmailView.as_view()),
+    path('update-email/', UpdateAdminEmailView.as_view(), name='update-email'),
+    path('me/', ProfileView.as_view(), name='profile-me'),
     path('personnel/', PersonnelListView.as_view(),   name='personnel-list'),
     path('personnel/<uuid:personnel_id>/',
          PersonnelDetailView.as_view(),
