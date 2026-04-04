@@ -232,13 +232,13 @@ class ForgotPasswordView(APIView):
 
         # ✅ ENVOI EMAIL
         try:
-            send_mail(
-                subject="Réinitialisation de mot de passe",
-                message=f"Cliquez sur ce lien pour réinitialiser votre mot de passe : {reset_link}",
-                from_email=settings.DEFAULT_FROM_EMAIL,
-                recipient_list=[user.email],
-                fail_silently=False,
-            )
+            # send_mail(
+            #     subject="Réinitialisation de mot de passe",
+            #     message=f"Cliquez sur ce lien pour réinitialiser votre mot de passe : {reset_link}",
+            #     from_email=settings.DEFAULT_FROM_EMAIL,
+            #     recipient_list=[user.email],
+            #     fail_silently=False,
+            # )
 
         except Exception as e:
             print("Erreur lors de l'envoi de l'email :", str(e))
