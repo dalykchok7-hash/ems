@@ -39,22 +39,31 @@ class CreerPersonnelSerializer(serializers.Serializer):
     date_embauche = serializers.DateField()
 
     def validate_email(self, value):
+        # ── Vérifier format d'abord ──
+        if not value or not value.strip():
+            raise serializers.ValidationError("L'email est obligatoire.")
+        # ── Ensuite vérifier unicité ──
         if Utilisateur.objects.filter(email__iexact=value).exists():
             raise serializers.ValidationError("Cet email est déjà utilisé.")
         return value
 
     def validate_username(self, value):
+        if not value or not value.strip():
+            raise serializers.ValidationError("Le nom d'utilisateur est obligatoire.")
         if Utilisateur.objects.filter(username__iexact=value).exists():
             raise serializers.ValidationError("Ce nom d'utilisateur est déjà pris.")
         return value
 
     def validate_cin(self, value):
+        # ── Vérifier longueur D'ABORD — arrêter ici si invalide ──
+        if not value.isdigit():
+            raise serializers.ValidationError("Le CIN doit contenir uniquement des chiffres.")
         if len(value) != 8:
-            raise serializers.ValidationError("Le CIN doit contenir 8 chiffres.")
-        if Utilisateur.objects.filter(cin__iexact=value).exists():
+            raise serializers.ValidationError("Le CIN doit contenir exactement 8 chiffres.")
+        # ── Vérifier unicité SEULEMENT si format correct ──
+        if Utilisateur.objects.filter(cin=value).exists():
             raise serializers.ValidationError("Ce CIN est déjà utilisé.")
         return value
-
 
 class LoginSerializer(serializers.Serializer):
     username = serializers.CharField(max_length=150)
