@@ -46,7 +46,7 @@ class HistoriqueService:
             details   = {
                 'client_cin'  : abonnement.client.cin,
                 'client_nom'  : f"{abonnement.client.prenom} {abonnement.client.nom}",
-                'type'        : abonnement.type,
+                'type'        : abonnement.pack.nom if abonnement.pack else '—',
                 'prix_paye'   : str(abonnement.prix_paye),
             }
         )

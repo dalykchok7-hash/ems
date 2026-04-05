@@ -286,11 +286,16 @@ class ProfileView(APIView):
         responses={200: OpenApiTypes.OBJECT}
     )
     def get(self, request):
+        print(f"DEBUG: ProfileView GET request from user: {request.user}")
         user = request.user
-        return Response({
-            "id": str(user.id),
-            "username": user.username,
-            "email": user.email,
-            "nom": user.get_full_name(),
-            "role": user.role
-        })
+        try:
+            return Response({
+                "id": str(user.id),
+                "username": user.username,
+                "email": user.email,
+                "nom": user.get_full_name(),
+                "role": user.role
+            })
+        except Exception as e:
+            print(f"DEBUG: ProfileView ERROR: {str(e)}")
+            return Response({"error": "Internal server error"}, status=500)

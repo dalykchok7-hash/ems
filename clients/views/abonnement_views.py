@@ -142,8 +142,8 @@ class AbonnementClientView(APIView):
 
         try:
             HistoriqueService.creer_abonnement(request.user, abonnement)
-        except Exception:
-            pass
+        except Exception as e:
+            print(f"ERROR: Failed to create history entry for abonnement: {e}")
 
         return Response(AbonnementSerializer(abonnement).data, status=status.HTTP_201_CREATED)
 
