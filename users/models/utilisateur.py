@@ -61,6 +61,9 @@ class Utilisateur(AbstractUser):
         null=True,
         blank=True
     )
+    email = models.EmailField(
+    unique=True
+)
 
     USERNAME_FIELD  = 'username'
     REQUIRED_FIELDS = ['email', 'role']
